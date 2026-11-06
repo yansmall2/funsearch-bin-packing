@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "arms": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "calls_per_run": null,
+  "islands": 4,
+  "reset_every": 50,
+  "audit_rate": 0.1,
+  "database_temperature": 1.0,
+  "evaluation_timeout_seconds": 30,
+  "validation_timeout_seconds": 30,
+  "final_timeout_seconds": 30
+}

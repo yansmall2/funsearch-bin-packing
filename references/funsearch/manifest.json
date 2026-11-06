@@ -1,0 +1,35 @@
+{
+  "verified_on": "2026-10-13",
+  "sources": [
+    {
+      "file": "official_readme.md",
+      "url": "https://raw.githubusercontent.com/google-deepmind/funsearch/main/README.md",
+      "sha256": "8dd2284a81d1d32ae44c74b75a7050856d06e9cc2b786a8705ce5dbd8dfca7e6"
+    },
+    {
+      "file": "programs_database.py",
+      "url": "https://raw.githubusercontent.com/google-deepmind/funsearch/main/implementation/programs_database.py",
+      "sha256": "b2bef312d04861f467f304f65788efe959f0493818976b052c46b4703151affc"
+    },
+    {
+      "file": "bin_packing.ipynb",
+      "url": "https://raw.githubusercontent.com/google-deepmind/funsearch/main/bin_packing/bin_packing.ipynb",
+      "sha256": "eec45846a8661722addbb856179327cf2ede0bc502e32be4ad58a6ac54e0aca6"
+    },
+    {
+      "file": "deepseek-pricing.html",
+      "url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "sha256": "5a7b1832592387340f2fc456399b34b89b05f3fa167c2e35909e2fa4afe021e3"
+    },
+    {
+      "file": "deepseek-thinking.html",
+      "url": "https://api-docs.deepseek.com/guides/thinking_mode",
+      "sha256": "35350389e59872d3733f7b7f99f5485c6cbc95f1bc2a71a47ba3ecf30bd7a060"
+    },
+    {
+      "file": "orlib.html",
+      "url": "https://people.brunel.ac.uk/~mastjjb/jeb/orlib/binpackinfo.html",
+      "sha256": "15937660a61f827c70073d1fa3648df7781b61e4e9789cc482e482411e4fa889"
+    }
+  ]
+}

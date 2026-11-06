@@ -1,0 +1,13 @@
+{
+  "purpose": "integration checks only; not LLM experimental evidence",
+  "arms": ["A", "B", "C", "D"],
+  "seeds": [11, 22, 33],
+  "calls_per_run": 16,
+  "islands": 4,
+  "reset_every_requests": 50,
+  "cluster_sampling_temperature": 1.0,
+  "probe_stages": [32, 96],
+  "audit_probability": 0.1,
+  "heldout_evaluation": false,
+  "command": "python experiment.py --out_dir run_1 --provider offline --calls 16 --seeds 11 22 33"
+}

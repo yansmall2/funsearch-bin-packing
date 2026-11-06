@@ -1,0 +1,230 @@
+"""Reproduce local checks, baselines, or a logged four-arm pilot.
+
+Default is offline. Paid requests require --provider api --allow-paid and a
+complete enabled budget configuration, as well as an environment API key.
+"""
+from __future__ import annotations
+
+import argparse
+import time
+from pathlib import Path
+
+from funpack.data import _generate_probes, load_instances, load_probes
+from funpack.packing import best_fit_scores, evaluate, first_fit_scores, pack
+from funpack.programs import Program, BF_CODE, FF_CODE
+from funpack.providers import ApiProvider, OfflineProvider
+from funpack.protocol import core_source_hashes, load_protocol, public_api_config, validate_runtime
+from funpack.search import ARMS, run_search
+from funpack.storage import digest, environment, read_json, source_hashes, write_json
+
+
+def baselines(data_dir, out_dir):
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    results = {"environment": environment(), "scope": "development_and_search_only",
+               "heldout_evaluated": False, "results": {}}
+    for split in ("development", "search"):
+        instances = load_instances(Path(data_dir) / f"{split}.json")
+        results["results"][split] = {"data_hash": digest(instances), "instance_ids": [i["id"] for i in instances]}
+        for name, policy in (("FF", first_fit_scores), ("BF", best_fit_scores)):
+            start = time.perf_counter()
+            result = evaluate(policy, instances)
+            result["seconds"] = time.perf_counter() - start
+            results["results"][split][name] = result
+    results["hand_example"] = {
+        name: pack([6, 7, 3, 4], 10, policy, trace=True)
+        for name, policy in (("FF", first_fit_scores), ("BF", best_fit_scores))}
+    write_json(out_dir / "baselines.json", results)
+    return results
+
+
+def select_validation(run_dir, validation, timeout_seconds=30):
+    run_dir = Path(run_dir)
+    info = read_json(run_dir / "final_info.json")
+    start = time.perf_counter()
+    measured = []
+    for record in info["top_search_candidates"]:
+        candidate = {"id": record["id"], "code": record["code"], "code_hash": record["code_hash"],
+                     "search_mean_bins": record["mean_bins"]}
+        try:
+            program = Program(record["code"])
+            deadline = time.perf_counter() + timeout_seconds
+            def bounded(item, bins):
+                if time.perf_counter() > deadline:
+                    raise RuntimeError("validation evaluation time budget exceeded")
+                return program(item, bins)
+            outcome = evaluate(bounded, validation)
+            if time.perf_counter() > deadline:
+                raise RuntimeError("validation evaluation time budget exceeded")
+            candidate.update(validation=outcome, status="valid")
+        except (ValueError, ArithmeticError, TypeError, RuntimeError) as error:
+            candidate.update(status="validation_error", error=f"{type(error).__name__}: {error}")
+        measured.append(candidate)
+    valid = [record for record in measured if record["status"] == "valid"]
+    fallback = not valid
+    if fallback:
+        for label, code in (("fallback_ff", FF_CODE), ("fallback_bf", BF_CODE)):
+            record = {"id": label, "code": code, "code_hash": digest(code), "search_mean_bins": None,
+                      "validation": evaluate(Program(code), validation), "status": "valid_seed_fallback"}
+            measured.append(record)
+            valid.append(record)
+    valid.sort(key=lambda record: (record["validation"]["mean_bins"],
+                                  record["search_mean_bins"] or 0, len(record["code"]), record["code_hash"]))
+    selection = {"selection_rule": "search top5; validation mean; search mean; code length; hash",
+                 "validation_hash": digest(validation), "candidates": measured,
+                 "selected": valid[0], "used_seed_fallback": fallback, "heldout_evaluated": False,
+                 "evidence_scope": info["evidence_scope"], "timeout_seconds": timeout_seconds,
+                 "seconds": time.perf_counter() - start}
+    write_json(run_dir / "selection.json", selection)
+    return selection
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--stage", choices=["baselines", "search", "all"], default="all")
+    parser.add_argument("--data", default="data")
+    parser.add_argument("--out_dir", default="run_1")
+    parser.add_argument("--provider", choices=["offline", "api"], default="offline")
+    parser.add_argument("--api-config", default="configs/api.local.json")
+    parser.add_argument("--allow-paid", action="store_true")
+    parser.add_argument("--arms", nargs="+", choices=list(ARMS), default=list(ARMS))
+    parser.add_argument("--seeds", nargs="+", type=int, default=[11, 22, 33])
+    parser.add_argument("--calls", type=int, default=16)
+    parser.add_argument("--islands", type=int, default=4)
+    parser.add_argument("--reset-every", type=int, default=50)
+    parser.add_argument("--audit-rate", type=float, default=0.1)
+    parser.add_argument("--database-temperature", type=float, default=1.0)
+    parser.add_argument("--evaluation-timeout-seconds", type=float, default=30)
+    parser.add_argument("--validation-timeout-seconds", type=float, default=30)
+    parser.add_argument("--protocol", help="Frozen formal protocol; prefer formal.py run")
+    args = parser.parse_args(argv)
+    if args.calls < 1 or args.calls > 100000:
+        parser.error("calls must be in [1,100000]")
+    if len(set(args.arms)) != len(args.arms) or len(set(args.seeds)) != len(args.seeds):
+        parser.error("duplicate arms or seeds are not permitted")
+    import math
+    if not all(math.isfinite(x) and x > 0 for x in (
+            args.database_temperature, args.evaluation_timeout_seconds, args.validation_timeout_seconds)):
+        parser.error("temperatures and timeouts must be finite and positive")
+    if not 0 <= args.audit_rate <= 1 or args.islands < 1 or args.reset_every < 0:
+        parser.error("invalid audit rate, island count or reset interval")
+    out_dir = Path(args.out_dir)
+    if out_dir.exists() and any(out_dir.iterdir()):
+        parser.error("use a NEW output directory; existing evidence will not be overwritten")
+    # Preflight occurs before creating any experiment outputs. One API provider
+    # spans every arm/seed so its cap is study-wide, not accidentally per run.
+    study_started = time.perf_counter()
+    api = protocol = None
+    api_config = read_json(args.api_config) if args.provider == "api" else None
+    data_dir = Path(args.data)
+    if args.protocol:
+        protocol = load_protocol(args.protocol, data_dir)
+        validate_runtime(protocol, args, api_config)
+    if args.provider == "api":
+        if not api_config.get("ledger_path"):
+            parser.error("paid API runs require a persistent ledger_path; see the CNY pilot example")
+        api = ApiProvider(api_config, allow_paid=args.allow_paid)
+        if protocol and api.config["max_requests"] - api.attempts < protocol["total_planned_requests"]:
+            raise ValueError("ledger has insufficient remaining request slots for all formal runs; "
+                             "do not reset the ledger or start an incomplete comparison")
+    instances = load_instances(data_dir / "search.json")
+    validation = load_instances(data_dir / "validation.json")
+    probes = load_probes(data_dir / "probes.json")
+    probe_construction_seconds = 0.0
+    if protocol:
+        # Construct once from development, before any search. Charge this measured
+        # cost to C/D; do not substitute a post-hoc timing for original setup.
+        development = load_instances(data_dir / "development.json")
+        started = time.perf_counter()
+        rebuilt = _generate_probes(development)["states"]
+        probe_construction_seconds = time.perf_counter() - started
+        if digest(rebuilt) != digest(probes):
+            raise ValueError("reconstructed probes differ from the frozen development probes")
+    setup_seconds = time.perf_counter() - study_started
+    out_dir.mkdir(parents=True, exist_ok=True)
+    manifest = {"phase": "formal" if protocol else ("offline_integration" if args.provider == "offline" else "pilot"),
+                "arguments": vars(args), "environment": environment(),
+                "source_hashes": source_hashes(Path(__file__).parent),
+                "search_hash": digest(instances), "validation_hash": digest(validation),
+                "probe_hash": digest(probes), "heldout_evaluated": False,
+                "runs": [], "note": "Offline fixtures cannot test the effect of prompts."}
+    if protocol:
+        manifest.update(protocol_id=protocol["protocol_id"],
+                        core_source_hashes=core_source_hashes(Path(__file__).parent))
+    manifest["timing"] = {
+        "setup_seconds": setup_seconds,
+        "probe_construction_seconds": probe_construction_seconds if protocol else None,
+        "common_setup_seconds": setup_seconds - probe_construction_seconds,
+        "allocation_rule": "common setup / planned runs; probe construction / planned screened runs",
+        "scope": "per-run pipeline includes seeds, generation, screening, audits, validation and run logs; "
+                 "study baseline report and top-level bookkeeping are measured separately",
+    }
+    if api is not None:
+        manifest["api_config"] = {key: api.config[key] for key in (
+            "base_url", "model", "expected_model_version", "api_key_env", "ledger_path", "temperature", "max_tokens", "timeout_seconds",
+            "max_requests", "extra_body", "budget") if key in api.config}
+        if protocol:
+            manifest["api_config"] = public_api_config(api.config)
+    write_json(out_dir / "study.json", manifest)
+    if args.stage in ("baselines", "all"):
+        started = time.perf_counter()
+        result = baselines(data_dir, out_dir)
+        manifest["timing"]["baseline_report_seconds"] = time.perf_counter() - started
+        print("Baseline correctness and search-set comparison; held-out tests remain sealed.")
+        for split, values in result["results"].items():
+            print(f"{split}: FF={values['FF']['mean_bins']:.3f}, BF={values['BF']['mean_bins']:.3f} bins")
+    if args.stage in ("search", "all"):
+        for seed_index, seed in enumerate(args.seeds):
+            # Rotate order across repetitions to reduce API-time/order confounding.
+            order = args.arms[seed_index % len(args.arms):] + args.arms[:seed_index % len(args.arms)]
+            for arm in order:
+                run_name = f"{arm}_seed{seed}"
+                config = {"arm": arm, "seed": seed, "calls": args.calls, "islands": args.islands,
+                          "reset_every": args.reset_every, "audit_rate": args.audit_rate,
+                          "temperature": args.database_temperature,
+                          "evaluation_timeout_seconds": args.evaluation_timeout_seconds}
+                if protocol:
+                    config["protocol_id"] = protocol["protocol_id"]
+                print(f"{run_name}: {args.provider}; {args.calls} candidate requests. "
+                      + ("Frozen formal search; not a final test." if protocol else
+                         ("Plumbing check, not LLM evidence." if api is None else "Pilot; not a final test.")), flush=True)
+                provider = api if api is not None else OfflineProvider(seed=seed)
+                started = time.perf_counter()
+                info = run_search(instances, probes, provider, config, out_dir / run_name)
+                selection = select_validation(out_dir / run_name, validation, args.validation_timeout_seconds)
+                pipeline_seconds = time.perf_counter() - started
+                entry = {"run": run_name, "arm": arm, "seed": seed,
+                         "best_search_mean_bins": info["best_search_mean_bins"],
+                         "selected_validation_mean_bins": selection["selected"]["validation"]["mean_bins"],
+                         "metrics": info["metrics"], "termination": info["termination"]}
+                expected_runs = len(args.arms) * len(args.seeds)
+                screened_runs = sum(ARMS[a][1] for a in args.arms) * len(args.seeds)
+                common_share = manifest["timing"]["common_setup_seconds"] / expected_runs
+                probe_share = (probe_construction_seconds / screened_runs if ARMS[arm][1] and screened_runs else 0)
+                entry["timing"] = {
+                    "pipeline_seconds": pipeline_seconds,
+                    "common_setup_share_seconds": common_share,
+                    "probe_construction_share_seconds": probe_share if protocol else None,
+                    "inclusive_search_seconds": pipeline_seconds + common_share + probe_share if protocol else None,
+                }
+                manifest["runs"].append(entry)
+                write_json(out_dir / "study.json", manifest)
+                with (out_dir / "notes.txt").open("a", encoding="utf-8") as stream:
+                    stream.write(f"{run_name}: phase={manifest['phase']}; {entry}\n")
+                print(f"  evaluated={info['metrics']['candidate_full_evaluations']}, "
+                      f"text hits={info['metrics']['text_cache_hits']}, "
+                      f"behavior skips={info['metrics']['behavior_skips']}; "
+                      f"best search={info['best_search_mean_bins']:.3f}", flush=True)
+                if info["termination"] != "request_budget_completed":
+                    manifest["stop_reason"] = info["termination"]
+                    manifest["timing"]["study_elapsed_seconds"] = time.perf_counter() - study_started
+                    write_json(out_dir / "study.json", manifest)
+                    print("Study stopped early. Incomplete runs cannot support a balanced four-arm comparison.")
+                    return
+    manifest["timing"]["study_elapsed_seconds"] = time.perf_counter() - study_started
+    write_json(out_dir / "study.json", manifest)
+    print(f"Saved: {out_dir.resolve()}; no held-out test evaluation performed.")
+
+
+if __name__ == "__main__":
+    main()

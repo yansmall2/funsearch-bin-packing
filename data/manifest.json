@@ -1,0 +1,104 @@
+{
+  "files": {
+    "development.json": {
+      "bytes": 62487,
+      "sha256": "563275ba5302a8f0b1b0d10d99d44efc1f5e49f051266a97e0fac1914bb57746"
+    },
+    "heldout/or3.json": {
+      "bytes": 125157,
+      "sha256": "1b6c81badcfd5ec8f99c74a12078a712b4e98b747cd6063b60d538e68c5619f7"
+    },
+    "heldout/test.json": {
+      "bytes": 186449,
+      "sha256": "9e5ed4d70c39b3cefe8b209c5915ce30d75c0bb82081e244aa9888075309cbff"
+    },
+    "probes.json": {
+      "bytes": 43947,
+      "sha256": "e0da70485646ef53a27f75501da5b0d8c3d1b747e2e5a223920c4750707bf1cf"
+    },
+    "search.json": {
+      "bytes": 186512,
+      "sha256": "d340309bc97b98725cc43aaa8e5d8f12bb174b75cb7aeb724953f62e041e8dfd"
+    },
+    "validation.json": {
+      "bytes": 62476,
+      "sha256": "a45aa2f9b92580f661bd1c67d945cd6904c8d8afed3425af7f382c61c1d15bb3"
+    }
+  },
+  "generator_version": "funpack-data-v1",
+  "heldout_policy": "test and OR3 are never loaded by default. Freeze candidate selection before explicit final evaluation; do not tune afterward.",
+  "or3": {
+    "provenance": {
+      "attribution": "Copyright 2023 DeepMind Technologies Limited. Romera-Paredes et al., Mathematical discoveries from program search with large language models, Nature (2023), DOI: 10.1038/s41586-023-06924-6; OR-Library, J. E. Beasley.",
+      "extraction": "ast.literal_eval of literal datasets['OR3']; no notebook execution",
+      "license": "DeepMind repository states software Apache-2.0; other materials CC-BY-4.0. This data export is attributed under that statement; no separate OR-Library dataset license was independently verified.",
+      "license_urls": [
+        "https://creativecommons.org/licenses/by/4.0/legalcode",
+        "https://www.apache.org/licenses/LICENSE-2.0"
+      ],
+      "order": "Original notebook instance and item order preserved; never sorted/shuffled",
+      "source_manifest_sha256": "45ac3f0f75c3de8d7f81d45abac9b6f5b69c582ac2c936d100e0d41d9388e54e",
+      "source_notebook_sha256": "eec45846a8661722addbb856179327cf2ede0bc502e32be4ad58a6ac54e0aca6",
+      "source_url": "https://raw.githubusercontent.com/google-deepmind/funsearch/main/bin_packing/bin_packing.ipynb",
+      "source_verified_on": "2026-10-13",
+      "upstream_dataset": "OR-Library bin packing, OR3 (u500_00 through u500_19)",
+      "upstream_url": "https://people.brunel.ac.uk/~mastjjb/jeb/orlib/binpackinfo.html"
+    },
+    "status": "prepared"
+  },
+  "probes": {
+    "count": 128,
+    "path": "probes.json",
+    "pool_size": 3536,
+    "seed": 2026105800,
+    "source_split": "development",
+    "stage_sizes": [
+      32,
+      96
+    ],
+    "states_sha256": "e8b5c75384b4c67d208b4d0af353e499f58954e4326ca2dce1ca4ec1d15a2511"
+  },
+  "schema_version": 1,
+  "split_overlap_criterion": "SHA256 of capacity plus ordered items, excluding ID/seed",
+  "splits": {
+    "development": {
+      "heldout": false,
+      "instances": 10,
+      "instances_sha256": "e22a57e0a5249bc3c5c6603246740fd4bd4a1a475e80e120b2d1556e1d8cd83e",
+      "path": "development.json",
+      "seed_end": 2026101809,
+      "seed_start": 2026101800
+    },
+    "or3": {
+      "heldout": true,
+      "instances": 20,
+      "instances_sha256": "69952f39196d4c497eacd779f0e0e51e8207a019f30e53069704709d005450b2",
+      "path": "heldout/or3.json"
+    },
+    "search": {
+      "heldout": false,
+      "instances": 30,
+      "instances_sha256": "ef0f42e06ce9cb9354f3dea83382643cc143fdcd640595171ea01abf9c476a97",
+      "path": "search.json",
+      "seed_end": 2026102829,
+      "seed_start": 2026102800
+    },
+    "test": {
+      "heldout": true,
+      "instances": 30,
+      "instances_sha256": "54a6d07e7029407e9fe5c737f85bca85a8da4ad5b94106d364bbaae6b1bc36ed",
+      "path": "heldout/test.json",
+      "seed_end": 2026104829,
+      "seed_start": 2026104800
+    },
+    "validation": {
+      "heldout": false,
+      "instances": 10,
+      "instances_sha256": "394b41525697c8601d3b24ceb07fb6d495f0942865ee1097ce869fc56e15bc9e",
+      "path": "validation.json",
+      "seed_end": 2026103809,
+      "seed_start": 2026103800
+    }
+  },
+  "synthetic_split_overlap_checked": true
+}

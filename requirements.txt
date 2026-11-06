@@ -1,0 +1,3 @@
+# Core simulator, interpreter, search and tests use Python standard library only.
+# Optional plotting, pinned to the version verified for these figures:
+matplotlib==3.10.0
