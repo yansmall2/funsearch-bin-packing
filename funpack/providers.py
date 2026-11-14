@@ -51,11 +51,14 @@ OFFLINE_FIXTURES = [
 class OfflineProvider:
     """Same candidate stream for all arms; prompts affect the format wrapper only."""
 
-    def __init__(self, seed=0, fixtures=None):
+    def __init__(self, seed=0, fixtures=None, *, fixture_origin="handwritten"):
         self.fixtures = list(OFFLINE_FIXTURES if fixtures is None else fixtures)
         if not self.fixtures or not all(isinstance(x, str) for x in self.fixtures):
             raise ValueError("fixtures must be a nonempty list of strings")
         self.seed = int(seed)
+        if fixture_origin not in ("handwritten", "saved_llm_response"):
+            raise ValueError("unknown offline fixture origin")
+        self.fixture_origin = fixture_origin
         self.attempts = 0
         self.accounted_cost = 0.0
 
@@ -67,17 +70,21 @@ class OfflineProvider:
         text = "```python\n" + code + "\n```"
         enhanced_format = any("Start with 'Strategy:'" in message.get("content", "") for message in messages)
         if enhanced_format:
-            text = ("Strategy: This is a handwritten offline fixture for pipeline testing. "
-                    "Its fixed code does not depend on prompt quality and is not an LLM result.\n\n" + text)
+            text = (("Strategy: This is a handwritten offline fixture for pipeline testing. "
+                     if self.fixture_origin == "handwritten" else
+                     "Strategy: This replays a previously saved candidate for pipeline testing. ")
+                    + "Its fixed code does not depend on prompt quality and is not a new LLM result.\n\n" + text)
         return {
             "text": text,
             "raw_response": {"offline_fixture": True, "fixture_index": index,
+                             "fixture_origin": self.fixture_origin,
                              "code": code, "candidate_generation_ignores_prompt": True,
                              "enhanced_format_wrapper": enhanced_format},
             "usage": {"input_tokens": 0, "output_tokens": 0,
                       "prompt_tokens": 0, "completion_tokens": 0,
                       "input_tokens_known": True, "output_tokens_known": True},
-            "model": "handwritten-offline-fixtures-v1",
+            "model": ("handwritten-offline-fixtures-v1" if self.fixture_origin == "handwritten"
+                      else "saved-response-offline-replay-v1"),
             "provider": "offline_fixture", "offline_fixture": True,
             "elapsed_seconds": time.perf_counter() - started,
             "estimated_cost": 0.0, "cost_known": True,

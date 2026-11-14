@@ -18,6 +18,8 @@ from pathlib import Path
 from .data import load_instances, load_probes
 from .packing import evaluate
 from .programs import BF_CODE, FF_CODE, Program
+from .prompts import ENHANCED_VERSIONS, prompt_version
+from .screening import COLLISION_POLICIES
 from .providers import _contains_secret_field, preflight
 from .storage import digest, environment, read_json, write_json
 
@@ -103,9 +105,10 @@ def public_api_config(config):
 
 
 def draft_plan():
-    return {"schema_version": 1, "status": "draft", "arms": ["A", "B", "C", "D"],
+    return {"schema_version": 2, "status": "draft", "arms": ["A", "B", "C", "D"],
             "seeds": [11, 22, 33], "calls_per_run": None, "islands": 4,
             "reset_every": 50, "audit_rate": 0.1, "database_temperature": 1.0,
+            "enhanced_prompt_version": "mechanism_v3", "collision_policy": "disable_on_mismatch_v1",
             "evaluation_timeout_seconds": 30, "validation_timeout_seconds": 30,
             "final_timeout_seconds": 30}
 
@@ -113,7 +116,9 @@ def draft_plan():
 def _validate_plan(plan):
     _require(isinstance(plan, dict) and set(plan) == set(draft_plan()),
              "plan fields must match the draft schema")
-    _require(plan["schema_version"] == 1 and plan["status"] == "draft", "invalid plan schema/status")
+    _require(plan["schema_version"] == 2 and plan["status"] == "draft", "invalid plan schema/status")
+    _require(plan["enhanced_prompt_version"] in ENHANCED_VERSIONS, "unknown enhanced prompt version")
+    _require(plan["collision_policy"] in COLLISION_POLICIES, "unknown collision policy")
     _require(plan["arms"] == ["A", "B", "C", "D"], "formal comparison requires all four arms A-D")
     seeds = plan["seeds"]
     _require(isinstance(seeds, list) and len(seeds) >= 3 and all(type(x) is int for x in seeds)
@@ -164,7 +169,7 @@ def freeze_protocol(plan_path, api_config_path, data_dir, output_path, source_ro
     public = public_api_config(config)
     requests = len(plan["arms"]) * len(plan["seeds"]) * plan["calls_per_run"]
     _require(public["max_requests"] >= requests, "API request cap cannot cover the complete formal comparison")
-    payload = {"schema_version": 1, "kind": "formal_protocol", "frozen_at_utc": _now(),
+    payload = {"schema_version": 2, "kind": "formal_protocol", "frozen_at_utc": _now(),
                "plan": plan, "api_config": public, "total_planned_requests": requests,
                "source_hashes": core_source_hashes(source_root), **_data_snapshot(data_dir),
                "python_version": platform.python_version(),
@@ -179,7 +184,7 @@ def freeze_protocol(plan_path, api_config_path, data_dir, output_path, source_ro
 def load_protocol(path, data_dir, source_root=None):
     frozen = read_json(path)
     _check_signed(frozen, "protocol_id", "formal_protocol")
-    _require(frozen.get("schema_version") == 1, "unsupported protocol schema")
+    _require(frozen.get("schema_version") == 2, "unsupported protocol schema; use archived code for historical evidence")
     _validate_plan(frozen["plan"])
     _require(frozen["source_hashes"] == core_source_hashes(source_root),
              "core source changed after freezing; do not relabel existing results")
@@ -199,6 +204,7 @@ def validate_runtime(protocol, args, api_config):
     mapping = {"calls": "calls_per_run", "arms": "arms", "seeds": "seeds", "islands": "islands",
                "reset_every": "reset_every", "audit_rate": "audit_rate",
                "database_temperature": "database_temperature",
+               "enhanced_prompt_version": "enhanced_prompt_version", "collision_policy": "collision_policy",
                "evaluation_timeout_seconds": "evaluation_timeout_seconds",
                "validation_timeout_seconds": "validation_timeout_seconds"}
     for argument, field in mapping.items():
@@ -281,11 +287,18 @@ def _inspect_study(protocol, study_dir):
         config = {"arm": arm, "seed": seed, "calls": plan["calls_per_run"], "islands": plan["islands"],
                   "reset_every": plan["reset_every"], "audit_rate": plan["audit_rate"],
                   "temperature": plan["database_temperature"],
+                  "enhanced_prompt_version": plan["enhanced_prompt_version"],
+                  "collision_policy": plan["collision_policy"],
                   "evaluation_timeout_seconds": plan["evaluation_timeout_seconds"],
                   "protocol_id": protocol["protocol_id"]}
         module_hashes = {key.removeprefix("funpack/"): value for key, value in protocol["source_hashes"].items()
                          if key.startswith("funpack/")}
         for record in (info, manifest):
+            expected_method = {"prompt_version": prompt_version("enhanced" if arm in "BD" else "basic", plan["enhanced_prompt_version"]),
+                               "enhanced_prompt_version": plan["enhanced_prompt_version"],
+                               "screening_enabled": arm in "CD",
+                               "collision_policy": plan["collision_policy"] if arm in "CD" else "off"}
+            _require(record.get("method") == expected_method, "run method versions differ from protocol")
             _require(record.get("config") == config and record.get("provider_class") == "ApiProvider"
                      and record.get("heldout_evaluated") is False, "run configuration/provider differs from protocol")
             _require(record.get("evidence_scope") == "formal_comparison", "run is not formal LLM evidence")
@@ -305,6 +318,10 @@ def _inspect_study(protocol, study_dir):
                  and [r.get("request_index") for r in responses] == indices,
                  "missing, duplicate or unordered candidate requests")
         for event, saved in zip(events, responses):
+            _require(event.get("method") == saved.get("method") == expected_method,
+                     "event method versions differ from protocol")
+            _require(event.get("messages_hash") == saved.get("messages_hash") == digest(event.get("messages")),
+                     "prompt checksum mismatch")
             response = saved.get("response", {})
             _require(event.get("response") == response and event.get("messages") == saved.get("messages")
                      and bool(event.get("messages")), "prompt/response logs disagree")

@@ -4,16 +4,24 @@ import json
 
 from .programs import language_prompt
 
+ENHANCED_VERSIONS = ("enhanced_v1", "mechanism_v3")
 
-def build_messages(mode, parents):
+
+def prompt_version(mode, enhanced_version="enhanced_v1"):
+    if mode not in ("basic", "enhanced") or enhanced_version not in ENHANCED_VERSIONS:
+        raise ValueError("unknown prompt mode or enhanced version")
+    return "basic_v1" if mode == "basic" else enhanced_version
+
+
+def build_messages(mode, parents, *, enhanced_version="enhanced_v1"):
     """Build the basic/enhanced prompt with an intentionally narrow parent schema.
 
     Unknown parent keys (test results, probe signatures, audit outcomes, etc.)
     are never serialized. Enhanced adds a brief strategy description, not an
     additional LLM call or a request for private step-by-step reasoning.
     """
-    if mode not in ("basic", "enhanced"):
-        raise ValueError("mode must be 'basic' or 'enhanced'")
+    # Keep the legacy default for historical callers. New experiment plans pin v3.
+    prompt_version(mode, enhanced_version)
     clean_parents = []
     for parent in parents:
         code = parent.get("code")
@@ -39,7 +47,35 @@ def build_messages(mode, parents):
         + json.dumps(clean_parents, ensure_ascii=False, allow_nan=False)
         + "\n\n"
     )
-    if mode == "enhanced":
+    if mode == "enhanced" and enhanced_version == "mechanism_v3":
+        user = (
+            "The following programs and measured search-set bin counts are reference "
+            "strategies. Lower counts are better. Design one candidate with a coherent "
+            "decision mechanism that can change which feasible bin is selected relative "
+            "to the best supplied parent. You may redesign the scoring rule rather than "
+            "edit its constants. The objective remains fewer bins; novelty alone is not success.\n"
+            + json.dumps(clean_parents, ensure_ascii=False, allow_nan=False) + "\n\n"
+            "Choose one mechanism to explore: a piecewise preference over post-placement "
+            "residuals; a preference depending on the distribution of the currently feasible "
+            "residual capacities; or a conditional tradeoff between filling tightly and "
+            "preserving another useful residual size. These are suggestions, not guaranteed "
+            "improvements. Use only information in item and bins; never assume knowledge of "
+            "future items or access to unavailable bin state.\n\n"
+            "For a fixed item, a score that is strictly decreasing in residual capacity will "
+            "retain Best Fit's ranking. Adding the same item-dependent constant to every "
+            "score also leaves the ranking unchanged. Avoid proposing such transformations "
+            "as a new decision mechanism. A rule may agree with Best Fit in many states, "
+            "but the intended change should have a clear condition under which the ranking "
+            "can differ. Do not sacrifice feasibility or return an invalid score list.\n\n"
+            "Start with 'Strategy:' and use at most 80 English words to identify the "
+            "mechanism, the condition under which the preferred bin may change, and one "
+            "reason it could help or fail. Treat quality claims as hypotheses. Do not output "
+            "predicted witness indices or a step-by-step reasoning trace. Then provide one "
+            "complete priority(item, bins) function in exactly one Python code block using "
+            "the permitted language. Local execution will measure behavior and packing "
+            "quality independently of your description."
+        )
+    elif mode == "enhanced":
         user += (
             "Start with 'Strategy:' and at most 80 English words describing "
             "the intended change in bin-choice behavior and a situation where "

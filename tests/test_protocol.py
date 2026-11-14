@@ -106,6 +106,7 @@ def runtime(f):
                            calls=p["calls_per_run"], islands=p["islands"],
                            reset_every=p["reset_every"], audit_rate=p["audit_rate"],
                            database_temperature=p["database_temperature"],
+                           enhanced_prompt_version=p["enhanced_prompt_version"], collision_policy=p["collision_policy"],
                            evaluation_timeout_seconds=p["evaluation_timeout_seconds"],
                            validation_timeout_seconds=p["validation_timeout_seconds"])
 
@@ -147,6 +148,8 @@ def make_study(f, frozen):
                       "islands": f.plan["islands"], "reset_every": f.plan["reset_every"],
                       "audit_rate": f.plan["audit_rate"],
                       "temperature": f.plan["database_temperature"],
+                      "enhanced_prompt_version": f.plan["enhanced_prompt_version"],
+                      "collision_policy": f.plan["collision_policy"],
                       "evaluation_timeout_seconds": f.plan["evaluation_timeout_seconds"],
                       "protocol_id": frozen["protocol_id"]}
             with patch("funpack.search.source_hashes", return_value=module_sources):
@@ -186,6 +189,8 @@ class FreezeTests(unittest.TestCase):
             for field, value in (("provider", "offline"), ("stage", "search"),
                                  ("calls", 2), ("arms", ["A", "B"]),
                                  ("seeds", [11, 22]), ("audit_rate", 0.25),
+                                 ("enhanced_prompt_version", "enhanced_v1"),
+                                 ("collision_policy", "retain_representative"),
                                  ("database_temperature", 1.2)):
                 with self.subTest(field=field):
                     altered = copy.deepcopy(args)

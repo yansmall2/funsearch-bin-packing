@@ -12,6 +12,8 @@ from pathlib import Path
 from funpack.data import _generate_probes, load_instances, load_probes
 from funpack.packing import best_fit_scores, evaluate, first_fit_scores, pack
 from funpack.programs import Program, BF_CODE, FF_CODE
+from funpack.prompts import ENHANCED_VERSIONS
+from funpack.screening import COLLISION_POLICIES
 from funpack.providers import ApiProvider, OfflineProvider
 from funpack.protocol import core_source_hashes, load_protocol, public_api_config, validate_runtime
 from funpack.search import ARMS, run_search
@@ -94,6 +96,9 @@ def main(argv=None):
     parser.add_argument("--reset-every", type=int, default=50)
     parser.add_argument("--audit-rate", type=float, default=0.1)
     parser.add_argument("--database-temperature", type=float, default=1.0)
+    parser.add_argument("--enhanced-prompt-version", choices=ENHANCED_VERSIONS, default="enhanced_v1",
+                        help="Explicitly select mechanism_v3 for the revised method; legacy default is retained")
+    parser.add_argument("--collision-policy", choices=COLLISION_POLICIES, default="retain_representative")
     parser.add_argument("--evaluation-timeout-seconds", type=float, default=30)
     parser.add_argument("--validation-timeout-seconds", type=float, default=30)
     parser.add_argument("--protocol", help="Frozen formal protocol; prefer formal.py run")
@@ -182,6 +187,8 @@ def main(argv=None):
                 config = {"arm": arm, "seed": seed, "calls": args.calls, "islands": args.islands,
                           "reset_every": args.reset_every, "audit_rate": args.audit_rate,
                           "temperature": args.database_temperature,
+                          "enhanced_prompt_version": args.enhanced_prompt_version,
+                          "collision_policy": args.collision_policy,
                           "evaluation_timeout_seconds": args.evaluation_timeout_seconds}
                 if protocol:
                     config["protocol_id"] = protocol["protocol_id"]
@@ -214,6 +221,7 @@ def main(argv=None):
                 print(f"  evaluated={info['metrics']['candidate_full_evaluations']}, "
                       f"text hits={info['metrics']['text_cache_hits']}, "
                       f"behavior skips={info['metrics']['behavior_skips']}; "
+                      f"API errors={info['metrics']['provider_errors']}; "
                       f"best search={info['best_search_mean_bins']:.3f}", flush=True)
                 if info["termination"] != "request_budget_completed":
                     manifest["stop_reason"] = info["termination"]

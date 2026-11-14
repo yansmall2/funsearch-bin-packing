@@ -8,9 +8,9 @@ from pathlib import Path
 from .database import Database
 from .packing import evaluate
 from .programs import BF_CODE, FF_CODE, CODE_LANGUAGE_VERSION, Program, extract_response
-from .prompts import build_messages
+from .prompts import build_messages, prompt_version
 from .providers import BudgetExceeded
-from .screening import BehavioralScreen
+from .screening import BehavioralScreen, COLLISION_POLICIES
 from .storage import append_jsonl, digest, environment, source_hashes, write_json
 
 ARMS = {"A": ("basic", False), "B": ("enhanced", False),
@@ -19,12 +19,17 @@ EVALUATOR_VERSION = "feasible-opened-only_max-first_v1"
 
 
 def run_search(instances, probes, provider, config, out_dir):
+    arm = config["arm"]
+    mode, screening = ARMS[arm]
+    enhanced_version = config.get("enhanced_prompt_version", "enhanced_v1")
+    version = prompt_version(mode, enhanced_version)
+    collision_policy = config.get("collision_policy", "retain_representative")
+    if collision_policy not in COLLISION_POLICIES:
+        raise ValueError("unknown collision policy")
     out_dir = Path(out_dir)
     if out_dir.exists() and any(out_dir.iterdir()):
         raise FileExistsError(f"Refusing to overwrite run directory: {out_dir}")
     out_dir.mkdir(parents=True, exist_ok=True)
-    arm = config["arm"]
-    mode, screening = ARMS[arm]
     calls, seed = config["calls"], config["seed"]
     audit_rate = config.get("audit_rate", 0.1)
     if type(calls) is not int or calls < 1 or not 0 <= audit_rate <= 1:
@@ -32,12 +37,14 @@ def run_search(instances, probes, provider, config, out_dir):
     timer = time.perf_counter()
     rng_audit = random.Random(seed + 1_000_003)
     db = Database(seed, config.get("islands", 4), config.get("temperature", 1.0))
-    screen = BehavioralScreen(probes) if screening else None
+    screen = BehavioralScreen(probes, collision_policy=collision_policy) if screening else None
     source_snapshot = source_hashes(Path(__file__).parent)
     context = digest({"search_data": instances, "language": CODE_LANGUAGE_VERSION,
                       "evaluator": EVALUATOR_VERSION, "source_hashes": source_snapshot,
                       "evaluation_timeout_seconds": config.get("evaluation_timeout_seconds", 30)})
-    provenance = {"config": config, "environment": environment(), "search_context_hash": context,
+    method = {"prompt_version": version, "enhanced_prompt_version": enhanced_version,
+              "screening_enabled": screening, "collision_policy": collision_policy if screening else "off"}
+    provenance = {"config": config, "method": method, "environment": environment(), "search_context_hash": context,
                   "search_hash": digest(instances),
                   "probe_hash": digest(probes), "source_hashes": source_snapshot,
                   "dataset_role": "search", "heldout_evaluated": False,
@@ -48,10 +55,13 @@ def run_search(instances, probes, provider, config, out_dir):
     write_json(out_dir / "run_manifest.json", provenance)
     records, cache = [], {}
     metrics = {"generator_requests": 0, "requests_attempted": 0, "paid_api_requests": 0,
+               "provider_errors": 0,
                "candidate_responses": 0, "code_extracted": 0,
                "valid_on_probes_or_search": 0, "format_violations": 0, "text_cache_hits": 0,
                "behavior_matches": 0, "behavior_skips": 0, "audits": 0,
                "audit_count_mismatches": 0, "audit_trace_mismatches": 0,
+               "disabled_fingerprints": 0, "collision_bypass_full_evaluations": 0,
+               "collision_bypass_evaluation_seconds": 0.0, "collision_bypass_evaluation_errors": 0,
                "audit_evaluation_errors": 0, "probe_registration_errors": 0, "probe_errors": 0,
                "seed_full_evaluations": 0, "candidate_full_evaluations": 0,
                "successful_candidate_evaluations": 0, "invalid_candidates": 0,
@@ -92,9 +102,10 @@ def run_search(instances, probes, provider, config, out_dir):
     termination = "request_budget_completed"
     for request_index in range(1, calls + 1):
         island, parents = db.parents()
-        messages = build_messages(mode, parents)
+        messages = build_messages(mode, parents, enhanced_version=enhanced_version)
         event = {"request_index": request_index, "arm": arm, "island": island,
-                 "parents": [p["id"] for p in parents], "messages": messages}
+                 "parents": [p["id"] for p in parents], "messages": messages,
+                 "messages_hash": digest(messages), "method": method}
         # A pending record survives interruption without silently losing an attempted request.
         write_json(out_dir / "pending_request.json", event)
         started = time.perf_counter()
@@ -122,12 +133,23 @@ def run_search(instances, probes, provider, config, out_dir):
         metrics["unknown_cost_requests"] += int(not response.get("cost_known", False))
         prefix = tail = representative = None
         audit = False
+        collision_bypass = False
         if response.get("error"):
             event["status"] = "provider_error"
+            metrics["provider_errors"] += 1
             raw_response = response.get("raw_response")
             status = raw_response.get("http_status") if isinstance(raw_response, dict) else None
             if status in (401, 402, 403):
                 termination = "provider_auth_or_balance_error"
+            elif response["error"].get("type") == "network_error":
+                termination = "provider_network_error"
+            elif status is not None and 400 <= status < 500:
+                termination = "provider_request_error"
+            else:
+                termination = "provider_error"
+            # The response is already durably saved. Stop this run AND the outer
+            # study instead of spending every remaining request on a broken API.
+            event["stop_reason"] = termination
         else:
             metrics["candidate_responses"] += 1
             parsed = extract_response(response.get("text", ""), mode)
@@ -153,6 +175,9 @@ def run_search(instances, probes, provider, config, out_dir):
                             started = time.perf_counter()
                             try:
                                 representative, prefix, tail = screen.probe(program)
+                                collision_bypass = screen.is_disabled(prefix, tail)
+                                if collision_bypass:
+                                    event.update(collision_bypass=True, fingerprint_hash=digest([prefix, tail]))
                             except (ValueError, ArithmeticError, TypeError, RuntimeError) as error:
                                 # A probe failure does not establish invalidity on the search set.
                                 # Evaluate rather than silently filtering it from screened arms.
@@ -174,18 +199,30 @@ def run_search(instances, probes, provider, config, out_dir):
                         else:
                             metrics["candidate_full_evaluations"] += 1
                             metrics["audits"] += int(audit)
-                            record = full_record(code, program, f"candidate_{request_index:06d}")
+                            metrics["collision_bypass_full_evaluations"] += int(collision_bypass)
+                            evaluation_before = metrics["evaluation_seconds"]
+                            try:
+                                record = full_record(code, program, f"candidate_{request_index:06d}")
+                            finally:
+                                if collision_bypass:
+                                    metrics["collision_bypass_evaluation_seconds"] += metrics["evaluation_seconds"] - evaluation_before
                             metrics["valid_on_probes_or_search"] += 1
                             metrics["successful_candidate_evaluations"] += 1
                             db.add(record, island)
                             event.update(status="audit_evaluated" if audit else "evaluated",
                                          result={k: v for k, v in record.items() if k != "code"})
                             if audit:
+                                started = time.perf_counter()
                                 count_mismatch = record["counts"] != representative["counts"]
                                 trace_mismatch = record["trace_hashes"] != representative["trace_hashes"]
                                 metrics["audit_count_mismatches"] += int(count_mismatch)
                                 metrics["audit_trace_mismatches"] += int(trace_mismatch)
                                 event.update(audit_count_mismatch=count_mismatch, audit_trace_mismatch=trace_mismatch)
+                                if count_mismatch or trace_mismatch:
+                                    disabled = screen.disable(prefix, tail)
+                                    metrics["disabled_fingerprints"] += int(disabled)
+                                    event.update(fingerprint_disabled=disabled, fingerprint_hash=digest([prefix, tail]))
+                                metrics["screening_seconds"] += time.perf_counter() - started
                             if screen:
                                 started = time.perf_counter()
                                 try:
@@ -198,6 +235,7 @@ def run_search(instances, probes, provider, config, out_dir):
                                     metrics["screening_seconds"] += time.perf_counter() - started
                 except (ValueError, ArithmeticError, TypeError, RuntimeError) as error:
                     metrics["invalid_candidates"] += 1
+                    metrics["collision_bypass_evaluation_errors"] += int(collision_bypass)
                     if audit:
                         metrics["audit_evaluation_errors"] += 1
                     event.update(status="audit_evaluation_error" if audit else "candidate_error",

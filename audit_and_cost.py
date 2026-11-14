@@ -119,6 +119,7 @@ def analyze(study_dir, data_dir, setup_measurement=None):
         original_timing = run.get("timing", {})
         has_original_total = original_timing.get("inclusive_search_seconds") is not None
         cost = {"search_seconds_including_screening_and_audits": search_seconds,
+                "collision_bypass_evaluation_seconds_subset": metrics.get("collision_bypass_evaluation_seconds", 0.0),
                 "screening_seconds_in_search": metrics["screening_seconds"],
                 "evaluation_seconds_in_search_including_audits": metrics["evaluation_seconds"],
                 "generation_seconds_in_search": metrics["generation_seconds"],
@@ -136,6 +137,11 @@ def analyze(study_dir, data_dir, setup_measurement=None):
                 "reported_cost_estimate": metrics["estimated_cost_reported"],
                 "unknown_cost_requests": metrics["unknown_cost_requests"]}
         runs.append({"run": run["run"], "arm": run["arm"], "seed": run["seed"],
+                     "collision_handling": {
+                         "disabled_fingerprints": metrics.get("disabled_fingerprints", 0),
+                         "bypass_full_evaluations": metrics.get("collision_bypass_full_evaluations", 0),
+                         "bypass_evaluation_errors": metrics.get("collision_bypass_evaluation_errors", 0),
+                         "time_is_subset_of_total_evaluation": True},
                      "termination": run["termination"], "audits": audits, "cost": cost})
     return {"source_study": str(study_dir), "phase": study["phase"], "complete_balanced_study": complete,
             "run_count": run_count, "expected_run_count": expected_count, "runs": runs,
@@ -167,7 +173,8 @@ def main():
     rows = []
     for run in report["runs"]:
         rows.append({"run": run["run"], "arm": run["arm"], "seed": run["seed"],
-                     **{k: v for k, v in run["audits"].items() if k != "details"}, **run["cost"]})
+                     **{k: v for k, v in run["audits"].items() if k != "details"},
+                     **{"collision_" + k: v for k, v in run["collision_handling"].items()}, **run["cost"]})
     if rows:
         with (target / "per_run.csv").open("w", encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=list(rows[0]))

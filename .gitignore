@@ -18,6 +18,7 @@ configs/*.local.json
 run_paid*/
 run_*/
 analysis_*/
+verification_*/
 archive/
 final_evaluation*/
 protocol-frozen*.json

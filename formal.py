@@ -96,6 +96,8 @@ def main(argv=None):
                 "--calls", str(plan["calls_per_run"]), "--islands", str(plan["islands"]),
                 "--reset-every", str(plan["reset_every"]), "--audit-rate", str(plan["audit_rate"]),
                 "--database-temperature", str(plan["database_temperature"]),
+                "--enhanced-prompt-version", plan["enhanced_prompt_version"],
+                "--collision-policy", plan["collision_policy"],
                 "--evaluation-timeout-seconds", str(plan["evaluation_timeout_seconds"]),
                 "--validation-timeout-seconds", str(plan["validation_timeout_seconds"]),
             ])

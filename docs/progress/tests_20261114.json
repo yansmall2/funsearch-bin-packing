@@ -1,0 +1,20 @@
+{
+  "record_type": "test_result_summary_not_raw_console_log",
+  "date": "2026-11-14",
+  "scope": "local implementation snapshot packaged with current code for this synchronization",
+  "python": "3.13.5",
+  "command": "python -m unittest discover -s tests -v",
+  "tests_run": 187,
+  "passed": 186,
+  "errors": 1,
+  "skipped": 0,
+  "error_test": "test_ledger.LedgerTests.test_atomic_reservations_across_processes",
+  "error": "PermissionError: [WinError 5] when Windows sandbox blocks multiprocessing IPC pipe creation",
+  "separate_rerun": {
+    "command": "python -m unittest discover -s tests -p test_ledger.py -k atomic -v",
+    "environment": "outside sandbox",
+    "tests_run": 1,
+    "passed": 1
+  },
+  "provenance": "Observed terminal results from the earlier validation in this session; code hashes rechecked unchanged before upload; no new test run during packaging"
+}
