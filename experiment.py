@@ -102,6 +102,8 @@ def main(argv=None):
     parser.add_argument("--evaluation-timeout-seconds", type=float, default=30)
     parser.add_argument("--validation-timeout-seconds", type=float, default=30)
     parser.add_argument("--protocol", help="Frozen formal protocol; prefer formal.py run")
+    parser.add_argument("--time-probe-setup", action="store_true",
+                        help="Rebuild and time the frozen development probes before a pilot, as in a formal run")
     args = parser.parse_args(argv)
     if args.calls < 1 or args.calls > 100000:
         parser.error("calls must be in [1,100000]")
@@ -136,7 +138,8 @@ def main(argv=None):
     validation = load_instances(data_dir / "validation.json")
     probes = load_probes(data_dir / "probes.json")
     probe_construction_seconds = 0.0
-    if protocol:
+    timed_setup = bool(protocol) or args.time_probe_setup
+    if timed_setup:
         # Construct once from development, before any search. Charge this measured
         # cost to C/D; do not substitute a post-hoc timing for original setup.
         development = load_instances(data_dir / "development.json")
@@ -158,7 +161,7 @@ def main(argv=None):
                         core_source_hashes=core_source_hashes(Path(__file__).parent))
     manifest["timing"] = {
         "setup_seconds": setup_seconds,
-        "probe_construction_seconds": probe_construction_seconds if protocol else None,
+        "probe_construction_seconds": probe_construction_seconds if timed_setup else None,
         "common_setup_seconds": setup_seconds - probe_construction_seconds,
         "allocation_rule": "common setup / planned runs; probe construction / planned screened runs",
         "scope": "per-run pipeline includes seeds, generation, screening, audits, validation and run logs; "
@@ -211,8 +214,8 @@ def main(argv=None):
                 entry["timing"] = {
                     "pipeline_seconds": pipeline_seconds,
                     "common_setup_share_seconds": common_share,
-                    "probe_construction_share_seconds": probe_share if protocol else None,
-                    "inclusive_search_seconds": pipeline_seconds + common_share + probe_share if protocol else None,
+                    "probe_construction_share_seconds": probe_share if timed_setup else None,
+                    "inclusive_search_seconds": pipeline_seconds + common_share + probe_share if timed_setup else None,
                 }
                 manifest["runs"].append(entry)
                 write_json(out_dir / "study.json", manifest)

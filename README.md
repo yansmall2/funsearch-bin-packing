@@ -2,15 +2,44 @@
 
 CS5491 课程项目：用 A/B/C/D 四组对照研究提示词设计与行为筛查对在线装箱程序搜索质量及成本的影响。这是小规模 FunSearch-inspired 实现，不是原论文完整系统或性能复现。
 
-## 当前进度
+## 当前进度：2026-11-15
 
-2026-11-14 整理同步：当前代码、运行所需配置模板、测试和三份必要进度记录。
+DeepSeek `deepseek-flash` 开启低强度思考，固定搜索种子 11。四组各完成 50 次真实调用，接口错误为 0。这是单种子预实验，最终测试集和 OR3 尚未用于评估。[配置、分组指标、审计与可重放样例](docs/progress/low200_20261115.json)
 
-- 已实现机制导向 Prompt `mechanism_v3` 和审计碰撞后停用完整指纹的 `disable_on_mismatch_v1`。
-- 已加入首个接口错误停止当前运行及后续组、连接预检、进程内直连选项及有效生成状态汇总。
-- 最近一轮四组各 50 次请求全部 SSL 连接失败，有效候选为 0。累计尝试 408 次，包含这 200 次失败。四组 265.3 来自初始 BF，不能证明新方法有效。
-- 55.4464 元是未知费用的保守占位，非确认扣费；此前成功实验估算为 0.447984 元，非平台账单。
-- 正式多种子实验仍禁用，真实 test/OR3 未用于算法评估。下一步为恢复连接、核实未知费用，再用独立实验记录开展新的生成实验。
+| 组别 | 成功完整评估候选 | 指纹跳过 | 搜索最优平均箱数 | 入选程序验证平均箱数 |
+|---|---:|---:|---:|---:|
+| A：基础提示 | 47 | 0 | 265.300 | 267.7 |
+| B：增强提示 | 47 | 0 | 265.200 | 267.6 |
+| C：基础提示＋筛查 | 24 | 24 | 265.267 | 267.7 |
+| D：增强提示＋筛查 | 35 | 14 | 265.300 | 267.7 |
+
+平均箱数越少越好。Best Fit（BF）在 30 条搜索序列上平均 265.3 箱，在 10 条验证序列上平均 267.7 箱。B 组第 41 个候选在搜索集的 3 条序列、验证集的 1 条序列上各省 1 箱，其余持平。A、D 最终都选中了初始 BF。验证集用于挑选候选，不能代替独立测试。
+
+- **提示效果：** 在未启用筛查的 A、B 两组，分别有 0 和 12 次生成的候选在搜索集上严格胜过 BF。同一次搜索里的候选会互为父代，不能把它们当成独立重复。
+- **筛查效果：** 原定随机审计中，C 有 1/8、D 有 2/3 的候选与指纹代表在至少一条序列上用了不同箱数。另将全部 38 个实际跳过的候选放回搜索集复算：D 的第 3 个候选在 128 个探针上都和 BF 一样，却在三条序列上各省 1 箱，搜索均值为 265.200。它当时没有参加验证选择；表格保留 D 在原实验中的成绩。
+- **成本：** 本批约 3 小时 44 分，按报告的 token 用量估算 ¥16.46（非账单）。模型生成占总时间约 99.1%。筛查减少了完整评估次数，两对分组的总耗时变化方向不同。分组耗时已计入探针、审计和验证选择。
+
+## 离线核对本次成绩
+
+在仓库根目录启动 Python，执行以下代码即可用已提交的合成数据重新装箱，不调用 API。它检查 BF、两个入选程序（B/41、C/41）和两个当时被跳过的程序（C/5、D/3）。被跳过的程序只核对搜索集。
+
+```python
+import json
+from pathlib import Path
+from funpack.data import load_instances
+from funpack.packing import evaluate
+from funpack.programs import Program
+
+report = json.loads(Path("docs/progress/low200_20261115.json").read_text(encoding="utf-8"))
+sets = {s: load_instances(f"data/{s}.json") for s in ("search", "validation")}
+for name, case in report["examples"].items():
+    for split, expected in case["mean_bins"].items():
+        actual = evaluate(Program(case["priority"]), sets[split])["mean_bins"]
+        assert abs(actual - expected) < 1e-6, (name, split, actual, expected)
+        print(f"{name:>4} {split:10} {actual:.3f}")
+```
+
+`scripts/run_thinking_pilot_200.py --low` 是当日使用的运行入口，需要原实验的本地校准记录及账本。以上重放独立于这些私有文件；它核对候选得分，不重现模型生成过程。
 
 ## 离线运行
 
@@ -36,13 +65,11 @@ python formal.py --help
 | `configs/` | 离线配置、禁用的 API 模板及未启用的正式计划 |
 | `tests/` | 离线单元测试与集成测试 |
 
-## 必要记录
+## 历史记录
 
-- [当前进度](docs/progress/STATUS_20261114.md)
-- [失败实验摘要](docs/progress/thinking_failure_20261109.json)
-- [测试结果摘要](docs/progress/tests_20261114.json)
-
-本地 187 项测试中 186 项直接通过；1 项受 Windows 沙箱 IPC 权限限制，沙箱外单独复测通过。仓库不包含可选第三方 notebook，相关校验可按现有测试规则跳过。已有其他文档保留历史阶段信息，最新状态以上述记录为准。
+- [11 月 14 日代码与进度快照](docs/progress/STATUS_20261114.md)
+- [11 月 9 日网络失败与未知费用说明](docs/progress/thinking_failure_20261109.json)
+- [11 月 14 日测试记录](docs/progress/tests_20261114.json)
 
 ## 实验与证据边界
 

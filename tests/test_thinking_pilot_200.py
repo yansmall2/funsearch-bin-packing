@@ -2,15 +2,19 @@
 from contextlib import ExitStack
 import copy
 import io
+import json
 import os
 from pathlib import Path
+import random
 import shutil
 import unittest
 from unittest.mock import patch
 
 from funpack.ledger import BudgetLedger
+from funpack import data
 from funpack.protocol import CORE_FILES
-from funpack.storage import read_json, write_json
+from funpack.storage import append_jsonl, read_json, write_json
+from scripts.run_prompt_diagnostic import LOW_PATHS, LOW_VARIANTS, summarize_low16
 from scripts import run_thinking_pilot_200 as runner
 from test_protocol import make_data
 from test_search import workspace_temp
@@ -187,6 +191,113 @@ class ThinkingPilotTests(unittest.TestCase):
             result = runner.main(["--run"], root=self.root)
         self.assertEqual(result["status"], "finished_without_usable_generation")
         self.assertFalse(result["summary"]["all_arms_have_usable_candidates"])
+
+    def completed_low16(self):
+        cfg, high = runner.prepare(self.root)
+        history = dict(high["prior_ledgers"])
+        for retry in (False, True):
+            name = runner.artifact_paths(retry)["ledger"]
+            ledger = BudgetLedger(self.root / name, cfg)
+            item = ledger.reserve(.002)
+            if not retry:
+                ledger.settle(item["reservation_id"], None, None, None)
+            history[name] = runner.inspect_ledger(self.root / name)
+        cfg.update(max_requests=16, ledger_path=LOW_PATHS["ledger"])
+        cfg["extra_body"]["reasoning_effort"] = "low"
+        ledger = BudgetLedger(self.root / cfg["ledger_path"], cfg)
+        saved = self.root / LOW_PATHS["output"]
+        saved.mkdir()
+        events = []
+        for i in range(16):
+            item = ledger.reserve(.001)
+            ledger.settle(item["reservation_id"], .001, 1, 1)
+            event = {"context_index": i//2, "variant": LOW_VARIANTS[i%2], "generation_seconds": 0,
+                     "response": {"finish_reason": "stop", "cost_known": True},
+                     "evaluation": {"valid_search_evaluation": i != 15, "result": {"mean_bins": 2},
+                                    "novel_vs_bf_on_search": False, "mean_delta_vs_bf": 0}}
+            events.append(event)
+            append_jsonl(saved / "events.jsonl", event)
+        report = summarize_low16(events)
+        write_json(saved / "diagnostic_summary.json", report)
+        write_json(self.root / LOW_PATHS["active"], cfg)
+        write_json(self.root / LOW_PATHS["claim"], {
+            "status": "completed", "summary": report, "ledger_after": runner.inspect_ledger(self.root / cfg["ledger_path"]),
+            "authorized_scope": {"api_config": runner.public_api_config(cfg), "search_hash": high["data_hashes"]["search"],
+                                 "prior_ledgers": history, "prior_ledger_hashes": {n: runner.sha(self.root/n) for n in history}}})
+
+    def test_low_batch_runs_all_arms_using_calibrated_request_body_and_inclusive_timing(self):
+        self.completed_low16()
+        before = self.snapshot()
+        _, preview = runner.prepare(self.root, low=True, direct=True)
+        self.assertEqual(self.snapshot(), before)
+        self.assertEqual(preview["prior_amounts_cny_by_ledger_status"], {"known": .224, "unknown": .002, "reserved": .002})
+        # Only the fixture development set needs enough real states to rebuild 128 probes.
+        rng = random.Random(37)
+        instance = {"id": "low-fixture", "capacity": 100, "items": [rng.randint(20, 80) for _ in range(900)]}
+        instance["content_sha256"] = data.content_hash({k: instance[k] for k in ("capacity", "items")})
+        write_json(self.root / "data/development.json", data._wrapper("development", [instance]))
+        write_json(self.root / "data/probes.json", data._generate_probes([instance]))
+        def reply(req, timeout):
+            body = json.loads(req.data)
+            self.assertEqual((body["model"], body["thinking"], body["reasoning_effort"], body["top_p"], body["max_tokens"]),
+                             ("deepseek-flash", {"type": "enabled"}, "low", 1.0, 32768))
+            enhanced = "Start with 'Strategy:'" in body["messages"][-1]["content"]
+            code = "def priority(item, bins):\n    return [0 - r for r in bins]"
+            answer = ("Strategy: Fixture.\n" if enhanced else "") + "```python\n" + code + "\n```"
+            return io.BytesIO(json.dumps({"model": "fixture", "system_fingerprint": "fixture-only",
+                "choices": [{"message": {"content": answer}, "finish_reason": "stop"}],
+                "usage": {"prompt_tokens": 2, "completion_tokens": 3}}).encode())
+        self.network.side_effect = None
+        self.network.return_value.open.side_effect = reply  # Fake transport; the actual engine, ledger and audit run.
+        with patch.dict(os.environ, {"THINKING_TEST_KEY": "fixture-key"}):
+            claim = runner.main(["--run", "--low", "--direct"], root=self.root)
+        self.assertEqual(self.network.return_value.open.call_count, 200)
+        self.assertEqual(claim["status"], "completed")
+        self.assertTrue(claim["prior_ledgers_unchanged"])
+        saved = self.root / preview["artifacts"]["output"]
+        study = read_json(saved / "study.json")
+        self.assertEqual(study["phase"], "pilot")
+        self.assertFalse(study["heldout_evaluated"])
+        self.assertEqual([(r["arm"], r["seed"], r["metrics"]["paid_api_requests"]) for r in study["runs"]],
+                         [(a, 11, 50) for a in "ABCD"])
+        setup = study["timing"]["probe_construction_seconds"]
+        self.assertGreater(setup, 0)
+        for r in study["runs"]:
+            timing = r["timing"]
+            self.assertEqual(timing["probe_construction_share_seconds"], setup/2 if r["arm"] in "CD" else 0)
+            self.assertAlmostEqual(timing["inclusive_search_seconds"], timing["pipeline_seconds"]
+                                   + timing["common_setup_share_seconds"] + timing["probe_construction_share_seconds"])
+        self.assertEqual(claim["summary"]["rows"][0]["exploration"]["requests_with_known_search_score"], 50)
+        self.assertGreater(claim["summary"]["rows"][2]["exploration"]["unscored_behavior_skips"], 0)
+        with self.assertRaisesRegex(ValueError, "already claimed"):
+            runner.main(["--run", "--low"], root=self.root)
+        self.assertEqual(self.network.return_value.open.call_count, 200)
+
+    def test_low_gate_rejects_a_truncated_calibration_before_key_or_calls(self):
+        self.completed_low16()
+        path = self.root / LOW_PATHS["output"] / "events.jsonl"
+        events = [json.loads(s) for s in path.read_text(encoding="utf-8").splitlines()]
+        events[0]["response"]["finish_reason"] = "length"
+        path.write_text("\n".join(json.dumps(e) for e in events), encoding="utf-8")
+        with patch.object(runner.getpass, "getpass") as ask, self.assertRaisesRegex(ValueError, "generation gate"):
+            runner.main(["--low", "--run"], root=self.root)
+        self.assertFalse((self.root / runner.artifact_paths(low=True)["claim"]).exists())
+        ask.assert_not_called()
+        self.network.assert_not_called()
+
+    def test_probe_match_is_never_counted_as_a_good_candidate_or_parent(self):
+        bf = {"id": "seed_bf", "mean_bins": 3, "trace_hashes": ["bf"]}
+        good = {"id": "candidate_000001", "mean_bins": 3, "trace_hashes": ["other"]}
+        for r in (bf, good):
+            append_jsonl(self.root / "evaluated.jsonl", r)
+        e = {"response": {}, "parents": []}
+        events = [{**e, "status": "evaluated", "result": good},
+                  {**e, "status": "behavior_skip", "representative": good["id"], "parents": [good["id"]]},
+                  {**e, "status": "text_cache_hit", "representative": good["id"]}]
+        x = runner.measured_exploration(self.root, events)
+        self.assertEqual((x["requests_with_known_search_score"], x["different_trace_and_no_worse_than_bf_requests"],
+                          x["unscored_behavior_skips"]), (2, 2, 1))
+        self.assertEqual(x["of_these_ids_used_later_as_parent"], [good["id"]])
 
 
 class DirectConnectionTests(unittest.TestCase):

@@ -1,0 +1,354 @@
+{
+  "date": "2026-11-15",
+  "scope": "Single-seed paid pilot; validation selected among the top five search candidates. Not a final or multi-seed result. Lower mean bin counts are better.",
+  "search_seed": 11,
+  "model": {
+    "requested_id": "deepseek-flash",
+    "returned_ids": [
+      "deepseek-flash"
+    ],
+    "returned_system_fingerprints": [
+      "bc19ba97cbe016479903222bb1578db6"
+    ],
+    "thinking": "enabled",
+    "reasoning_effort": "low",
+    "configured_temperature": 0.8,
+    "configured_top_p": 1,
+    "max_tokens_per_request": 32768,
+    "timeout_seconds": 180
+  },
+  "design": {
+    "calls_per_arm": 50,
+    "islands": 4,
+    "reset_every": 50,
+    "probe_stages": [
+      32,
+      96
+    ],
+    "random_audit_probability": 0.1,
+    "on_audit_mismatch": "disable_on_mismatch_v1",
+    "tie_break": "earliest feasible bin among equal top scores",
+    "initial_programs": [
+      "FF",
+      "BF"
+    ],
+    "heldout_evaluated": false
+  },
+  "data": {
+    "search": {
+      "instances": 30,
+      "content_sha256": "ef0f42e06ce9cb9354f3dea83382643cc143fdcd640595171ea01abf9c476a97"
+    },
+    "validation": {
+      "instances": 10,
+      "content_sha256": "394b41525697c8601d3b24ceb07fb6d495f0942865ee1097ce869fc56e15bc9e"
+    },
+    "development_probes": {
+      "decisions": 128,
+      "content_sha256": "e8b5c75384b4c67d208b4d0af353e499f58954e4326ca2dce1ca4ec1d15a2511"
+    }
+  },
+  "baseline_bf_mean_bins": {
+    "search": 265.3,
+    "validation": 267.7
+  },
+  "batch": {
+    "requests": 200,
+    "provider_errors": 0,
+    "elapsed_seconds": 13432.752,
+    "generation_seconds": 13311.051,
+    "token_estimated_cny_this_batch": 16.460098,
+    "currency_note": "Estimate from reported token usage only; not a provider invoice. No earlier batch or unresolved historical charge is included.",
+    "timing_note": "Inclusive arm times include generation, evaluation, screening, random audits and validation selection. Common setup is shared across four arms, probe construction across C/D only."
+  },
+  "arms": {
+    "A": {
+      "prompt": "basic",
+      "behavior_screen": false,
+      "requests": 50,
+      "provider_errors": 0,
+      "invalid_candidates": 0,
+      "full_candidate_evaluation_attempts": 47,
+      "successful_full_candidate_evaluations": 47,
+      "exact_text_cache_hits": 3,
+      "unscored_behavior_skips": 0,
+      "requests_with_known_search_score": 50,
+      "requests_strictly_better_than_bf_on_search": 0,
+      "different_trace_and_no_worse_than_bf": 1,
+      "different_trace_and_no_worse_ids_later_used_as_parents": 0,
+      "online_best_search_mean_bins_including_seeds": 265.3,
+      "validation_selected_id": "seed_bf",
+      "selected_validation_mean_bins": 267.7,
+      "random_audit": {
+        "completed": 0,
+        "trace_disagreements": 0,
+        "bin_count_disagreements": 0,
+        "disabled_fingerprints": 0
+      },
+      "inclusive_seconds": 2143.805,
+      "generation_seconds": 2106.205,
+      "evaluation_seconds_including_audits": 36.13,
+      "input_tokens_reported": 37106,
+      "output_tokens_reported": 320730,
+      "token_estimated_cny": 2.640052
+    },
+    "B": {
+      "prompt": "mechanism_v3",
+      "behavior_screen": false,
+      "requests": 50,
+      "provider_errors": 0,
+      "invalid_candidates": 3,
+      "full_candidate_evaluation_attempts": 48,
+      "successful_full_candidate_evaluations": 47,
+      "exact_text_cache_hits": 0,
+      "unscored_behavior_skips": 0,
+      "requests_with_known_search_score": 47,
+      "requests_strictly_better_than_bf_on_search": 12,
+      "different_trace_and_no_worse_than_bf": 13,
+      "different_trace_and_no_worse_ids_later_used_as_parents": 7,
+      "online_best_search_mean_bins_including_seeds": 265.2,
+      "validation_selected_id": "candidate_000041",
+      "selected_validation_mean_bins": 267.6,
+      "random_audit": {
+        "completed": 0,
+        "trace_disagreements": 0,
+        "bin_count_disagreements": 0,
+        "disabled_fingerprints": 0
+      },
+      "inclusive_seconds": 4368.7,
+      "generation_seconds": 4329.611,
+      "evaluation_seconds_including_audits": 37.398,
+      "input_tokens_reported": 53585,
+      "output_tokens_reported": 650664,
+      "token_estimated_cny": 5.312482
+    },
+    "C": {
+      "prompt": "basic",
+      "behavior_screen": true,
+      "requests": 50,
+      "provider_errors": 0,
+      "invalid_candidates": 0,
+      "full_candidate_evaluation_attempts": 24,
+      "successful_full_candidate_evaluations": 24,
+      "exact_text_cache_hits": 2,
+      "unscored_behavior_skips": 24,
+      "requests_with_known_search_score": 26,
+      "requests_strictly_better_than_bf_on_search": 1,
+      "different_trace_and_no_worse_than_bf": 1,
+      "different_trace_and_no_worse_ids_later_used_as_parents": 0,
+      "online_best_search_mean_bins_including_seeds": 265.266667,
+      "validation_selected_id": "candidate_000041",
+      "selected_validation_mean_bins": 267.7,
+      "random_audit": {
+        "completed": 8,
+        "trace_disagreements": 1,
+        "bin_count_disagreements": 1,
+        "disabled_fingerprints": 1
+      },
+      "inclusive_seconds": 2900.707,
+      "generation_seconds": 2883.781,
+      "evaluation_seconds_including_audits": 15.056,
+      "input_tokens_reported": 37221,
+      "output_tokens_reported": 432026,
+      "token_estimated_cny": 3.53065
+    },
+    "D": {
+      "prompt": "mechanism_v3",
+      "behavior_screen": true,
+      "requests": 50,
+      "provider_errors": 0,
+      "invalid_candidates": 1,
+      "full_candidate_evaluation_attempts": 35,
+      "successful_full_candidate_evaluations": 35,
+      "exact_text_cache_hits": 0,
+      "unscored_behavior_skips": 14,
+      "requests_with_known_search_score": 35,
+      "requests_strictly_better_than_bf_on_search": 0,
+      "different_trace_and_no_worse_than_bf": 0,
+      "different_trace_and_no_worse_ids_later_used_as_parents": 0,
+      "online_best_search_mean_bins_including_seeds": 265.3,
+      "validation_selected_id": "seed_bf",
+      "selected_validation_mean_bins": 267.7,
+      "random_audit": {
+        "completed": 3,
+        "trace_disagreements": 2,
+        "bin_count_disagreements": 2,
+        "disabled_fingerprints": 2
+      },
+      "inclusive_seconds": 4019.11,
+      "generation_seconds": 3991.453,
+      "evaluation_seconds_including_audits": 25.601,
+      "input_tokens_reported": 51753,
+      "output_tokens_reported": 609176,
+      "token_estimated_cny": 4.976914
+    }
+  },
+  "posthoc_search_only": {
+    "scope": "All 38 non-audited behavior skips replayed on the original 30 search instances with the original candidate and logged representative. Bin-count disagreement means at least one per-instance count differs. Did not change the run, parent choices, validation shortlist or reported online scores.",
+    "arms": {
+      "C": {
+        "replayed": 24,
+        "trace_disagrees_with_representative": 7,
+        "bin_counts_disagree_with_representative": 6,
+        "fewer_total_bins_than_representative": 4,
+        "more_total_bins_than_representative": 2,
+        "strictly_better_than_bf": 2,
+        "request_ids_beating_original_arm_search_best": [
+          5
+        ]
+      },
+      "D": {
+        "replayed": 14,
+        "trace_disagrees_with_representative": 5,
+        "bin_counts_disagree_with_representative": 4,
+        "fewer_total_bins_than_representative": 1,
+        "more_total_bins_than_representative": 2,
+        "strictly_better_than_bf": 1,
+        "request_ids_beating_original_arm_search_best": [
+          3
+        ]
+      }
+    }
+  },
+  "examples": {
+    "BF": {
+      "role": "seed baseline; selected by arms A and D",
+      "priority": "def priority(item, bins):\n    return [-(r - item) for r in bins]\n",
+      "probe_choices_different_from_bf": 0,
+      "mean_bins": {
+        "search": 265.3,
+        "validation": 267.7
+      },
+      "different_trace_instances_vs_bf": {
+        "search": 0,
+        "validation": 0
+      },
+      "bin_count_changes_vs_bf": {
+        "search": [],
+        "validation": []
+      }
+    },
+    "B/41": {
+      "role": "validation-selected program from original run",
+      "priority": "def priority(item, bins):\n    return [-(r - item) - 1.1 * min((r - item) % item, item - ((r - item) % item)) for r in bins]\n",
+      "probe_choices_different_from_bf": 1,
+      "mean_bins": {
+        "search": 265.2,
+        "validation": 267.6
+      },
+      "different_trace_instances_vs_bf": {
+        "search": 13,
+        "validation": 6
+      },
+      "bin_count_changes_vs_bf": {
+        "search": [
+          {
+            "instance": "search_001",
+            "bf": 264,
+            "candidate": 263
+          },
+          {
+            "instance": "search_016",
+            "bf": 254,
+            "candidate": 253
+          },
+          {
+            "instance": "search_023",
+            "bf": 271,
+            "candidate": 270
+          }
+        ],
+        "validation": [
+          {
+            "instance": "validation_009",
+            "bf": 258,
+            "candidate": 257
+          }
+        ]
+      }
+    },
+    "C/41": {
+      "role": "validation-selected program from original run",
+      "priority": "def priority(item, bins):\n    return [-(r - item) - 0.5 * (item - (r - item) / 2) * (1 if (r - item) > 0 and (r - item) < item else 0) for r in bins]\n",
+      "probe_choices_different_from_bf": 0,
+      "mean_bins": {
+        "search": 265.266667,
+        "validation": 267.7
+      },
+      "different_trace_instances_vs_bf": {
+        "search": 5,
+        "validation": 0
+      },
+      "bin_count_changes_vs_bf": {
+        "search": [
+          {
+            "instance": "search_019",
+            "bf": 254,
+            "candidate": 253
+          }
+        ],
+        "validation": []
+      }
+    },
+    "C/5": {
+      "role": "skipped as BF; search-only retrospective replay; not selected or validation-scored",
+      "priority": "def priority(item, bins):\n    return [-(r - item) - 0.5 * (r % item) for r in bins]\n",
+      "probe_choices_different_from_bf": 0,
+      "mean_bins": {
+        "search": 265.233333
+      },
+      "different_trace_instances_vs_bf": {
+        "search": 6
+      },
+      "bin_count_changes_vs_bf": {
+        "search": [
+          {
+            "instance": "search_011",
+            "bf": 261,
+            "candidate": 260
+          },
+          {
+            "instance": "search_019",
+            "bf": 254,
+            "candidate": 253
+          }
+        ]
+      }
+    },
+    "D/3": {
+      "role": "skipped as BF; search-only retrospective replay; not selected or validation-scored",
+      "priority": "def priority(item, bins):\n    return [-(r - item) + (item / 2.0 if item <= (r - item) and (r - item) < 2 * item else 0.0) for r in bins]\n",
+      "probe_choices_different_from_bf": 0,
+      "mean_bins": {
+        "search": 265.2
+      },
+      "different_trace_instances_vs_bf": {
+        "search": 7
+      },
+      "bin_count_changes_vs_bf": {
+        "search": [
+          {
+            "instance": "search_001",
+            "bf": 264,
+            "candidate": 263
+          },
+          {
+            "instance": "search_011",
+            "bf": 261,
+            "candidate": 260
+          },
+          {
+            "instance": "search_019",
+            "bf": 254,
+            "candidate": 253
+          }
+        ]
+      }
+    }
+  },
+  "published_source_sha256": {
+    "experiment.py": "c958d706e1bab7965b100deafcab9dc9f8a0903ccb140134bd8d9887ee30a388",
+    "scripts/run_thinking_pilot_200.py": "a818d16ef6f0862a92cd6f922e87950f031b8437e83d5a0a82d8ea163795174d",
+    "tests/test_thinking_pilot_200.py": "4c68f0a114595b239c4b416cce852f4b63d624f94793cdb3815f4270ed8c571e"
+  }
+}

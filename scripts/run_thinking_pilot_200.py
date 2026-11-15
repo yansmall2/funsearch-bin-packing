@@ -1,4 +1,4 @@
-"""Authorized 4 x 50 thinking-mode pilot. Preview by default; --run starts it.
+"""4 x 50 thinking-mode pilot. Use --low for the calibrated batch; add --run to start.
 
 One seed, not a formal multi-seed result. Dedicated ledger; no automatic retry,
 resume, formal activation or held-out evaluation. Enter the key locally only.
@@ -12,10 +12,11 @@ import json
 import math
 import os
 from pathlib import Path
+import sqlite3
 import sys
 import time
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from urllib import error as urlerror, request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,7 +39,12 @@ CALLS = 50
 SEED = 11
 
 
-def artifact_paths(retry=False):
+def artifact_paths(retry=False, *, low=False):
+    if low:
+        if retry:
+            raise ValueError("the low-effort batch is separate from the high-effort network retry")
+        return {"active": "configs/low200.local.json", "claim": "configs/low200.claim.local.json",
+                "ledger": "configs/low200_budget.sqlite3", "output": "run_paid_low200_20261115"}
     if not retry:
         return {"active": ACTIVE, "claim": CLAIM, "ledger": LEDGER, "output": OUTPUT}
     return {"active": "configs/thinking200_retry1.local.json",
@@ -82,9 +88,57 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def prepare(root, *, retry=False, direct=False):
+def calibrated_low(root, histories):
+    """Reuse the completed low16 settings and recheck its gate against saved results."""
+    from scripts.run_prompt_diagnostic import LOW_PATHS, summarize_low16
+    config = read_json(root / LOW_PATHS["active"])
+    claim = read_json(root / LOW_PATHS["claim"])
+    scope = claim["authorized_scope"]
+    out = root / LOW_PATHS["output"]
+    summary = read_json(out / "diagnostic_summary.json")
+    events_path = out / "events.jsonl"
+    with events_path.open(encoding="utf-8") as stream:
+        check = summarize_low16([json.loads(line) for line in stream if line.strip()], summary.get("stop_reason"))
+    if (claim.get("status") != "completed" or claim.get("summary") != summary or not check["engineering_gate_passed"]
+            or check["stop_reason"] is not None or any(summary.get(k) != v for k, v in check.items())):
+        raise ValueError("low16 must be complete and pass its recorded generation gate")
+    if (public_api_config(config) != scope["api_config"] or config["model"] != "deepseek-flash"
+            or config["base_url"] != "https://api.deepseek.com" or config["ledger_path"] != LOW_PATHS["ledger"]
+            or config["max_requests"] != 16 or config["extra_body"] != {
+                "thinking": {"type": "enabled"}, "reasoning_effort": "low", "top_p": 1.0}):
+        raise ValueError("low16 model configuration differs from the recorded calibration")
+    # Keep every earlier ledger, including the interrupted high-effort request.
+    # Only fixed project paths may enter the read-only history comparison.
+    previous = set(histories) | {LEDGER, artifact_paths(retry=True)["ledger"]}
+    if previous != set(scope["prior_ledgers"]):
+        raise ValueError("low16 has a different ledger history")
+    for name in sorted(previous):
+        state = inspect_ledger(root / name)
+        if state != scope["prior_ledgers"][name] or sha(root / name) != scope["prior_ledger_hashes"][name]:
+            raise ValueError("prior ledger changed since low16: " + name)
+        histories[name] = state
+    state = inspect_ledger(root / LOW_PATHS["ledger"])
+    if (state != claim["ledger_after"] or state["attempts"] != 16 or state["signature"] != budget_signature(config)
+            or state["unknown_cost_requests"] or state["unresolved_reservations"]):
+        raise ValueError("low16 ledger does not match the completed 16 requests")
+    histories[LOW_PATHS["ledger"]] = state
+    return config, {"run": LOW_PATHS["output"], "valid": sum(r["valid_candidates"] for r in check["rows"]),
+                    "requests": 16, "events_sha256": sha(events_path), "search_hash": scope["search_hash"]}
+
+
+def amounts_by_status(root, names):
+    """Separate token-based estimates from unresolved charges (ledger units = 1e-12 CNY)."""
+    totals = Counter()
+    for name in names:
+        with closing(sqlite3.connect((root / name).resolve().as_uri() + "?mode=ro", uri=True)) as db:
+            for status, units in db.execute("SELECT status, SUM(accounted_units) FROM funpack_requests GROUP BY status"):
+                totals[status] += units
+    return {status: totals[status] / 1e12 for status in ("known", "unknown", "reserved")}
+
+
+def prepare(root, *, retry=False, direct=False, low=False):
     root = Path(root).resolve()
-    paths = artifact_paths(retry)
+    paths = artifact_paths(retry, low=low)
     histories = {}
     for config_name, claim_name, count in PRIOR:
         prior_config = read_json(root / config_name)
@@ -116,11 +170,15 @@ def prepare(root, *, retry=False, direct=False):
                     or any(e.get("response", {}).get("error", {}).get("type") != "network_error" for e in events)):
                 raise ValueError("the original batch is not entirely network-failed; inspect before retrying")
         histories[LEDGER] = old_state
-    config = copy.deepcopy(read_json(root / PRIOR[0][0]))
-    config.update(enabled=True, model="deepseek-flash", base_url="https://api.deepseek.com",
-                  expected_model_version="DeepSeek-V4.1-Flash-1017", max_requests=200,
-                  ledger_path=paths["ledger"], max_tokens=32768, timeout_seconds=180, temperature=0.8,
-                  extra_body={"thinking": {"type": "enabled"}, "reasoning_effort": "high", "top_p": 1.0})
+    calibration = None
+    if low:
+        config, calibration = calibrated_low(root, histories)
+    else:
+        config = copy.deepcopy(read_json(root / PRIOR[0][0]))
+        config.update(enabled=True, model="deepseek-flash", base_url="https://api.deepseek.com",
+                      expected_model_version="DeepSeek-V4.1-Flash-1017", max_tokens=32768, timeout_seconds=180,
+                      temperature=0.8, extra_body={"thinking": {"type": "enabled"}, "reasoning_effort": "high", "top_p": 1.0})
+    config.update(max_requests=200, ledger_path=paths["ledger"])
     # The user removed the previous small monetary constraint. Keep a finite
     # engineering guard sized for the entire authorized request/token envelope,
     # not the old CNY2/5/10 ceiling. This is NOT an expected bill or billing guarantee.
@@ -129,7 +187,7 @@ def prepare(root, *, retry=False, direct=False):
     config["budget"].update(currency="CNY", max_cost=guard, input_per_million=2, output_per_million=8,
                             connection_route="direct_for_api_host" if direct else "system_proxy_settings",
                             pricing_source="https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
-                            pricing_checked_date="2026-11-09")
+                            pricing_checked_date="2026-11-15" if low else "2026-11-09")
     public_api_config(config)
     plan = read_json(root / "configs/formal-plan.proposed.json")
     if plan.get("enhanced_prompt_version") != "mechanism_v3" or plan.get("collision_policy") != "disable_on_mismatch_v1":
@@ -137,6 +195,9 @@ def prepare(root, *, retry=False, direct=False):
     data = {name: digest(load_instances(root / "data" / (name + ".json")))
             for name in ("development", "search", "validation")}
     data["probes"] = digest(load_probes(root / "data/probes.json"))
+    if low and calibration["search_hash"] != data["search"]:
+        raise ValueError("search set differs from the low16 calibration")
+    prior_amounts = amounts_by_status(root, histories)
     ledger_path = paths["ledger"]
     blockers = [name for name in (paths["active"], paths["claim"], ledger_path, ledger_path+"-wal", ledger_path+"-shm", ledger_path+"-journal", paths["output"])
                 if (root / name).exists()]
@@ -150,14 +211,18 @@ def prepare(root, *, retry=False, direct=False):
                "prior_requests": sum(s["attempts"] for s in histories.values()),
                "prior_estimated_cost_cny": sum(s["accounted_cost_cny"] for s in histories.values()),
                "prior_unknown_cost_requests": sum(s["unknown_cost_requests"] for s in histories.values()),
-               "prior_unknown_reservations_cny": sum(s["accounted_cost_cny"] for s in histories.values() if s["unknown_cost_requests"]),
+               "prior_unknown_reservations_cny": prior_amounts["unknown"],
+               "prior_amounts_cny_by_ledger_status": prior_amounts,
                "effective_temperature": None, "temperature_note": "ignored by DeepSeek in thinking mode",
-               "reasoning_effort": "high", "request_timeout_seconds": 180,
+               "reasoning_effort": config["extra_body"]["reasoning_effort"], "request_timeout_seconds": config["timeout_seconds"],
                "money_guard_note": "Token-envelope engineering guard, not a price forecast. The old small pilot cap does not apply.",
                "input_token_envelope_for_guard": input_envelope,
                "heldout_loaded": False, "automatic_formal_run": False,
                "authorization": "User requested thinking mode and 50 requests per arm; earlier 100-per-arm instruction superseded.",
                "limitations": "One seed and a changed model mode; cannot isolate a thinking-mode effect against older runs or claim formal multi-seed results."}
+    if low:
+        preview.update(calibration=calibration, authorization="Approved low-effort pilot: 50 requests per arm, seed 11.",
+                       islands=4, reset_every=50, audit_rate=0.1, probe_stages=[32, 96], time_probe_setup=True)
     return config, preview
 
 
@@ -167,7 +232,7 @@ def summarize(root, preview):
     entries = []
     for run in study["runs"]:
         events = [json.loads(s) for s in (root/paths["output"]/run["run"]/"events.jsonl").read_text(encoding="utf-8").splitlines()]
-        reasons = Counter(e.get("response", {}).get("finish_reason") or "unknown" for e in events)
+        reasons = Counter(e["response"].get("finish_reason") or "unknown" for e in events if "response" in e)
         thinking_present = 0
         for event in events:
             raw = event.get("response", {}).get("raw_response") or {}
@@ -181,13 +246,21 @@ def summarize(root, preview):
                         "best_search_mean_bins": run["best_search_mean_bins"],
                         "selected_validation_mean_bins": run["selected_validation_mean_bins"],
                         "finish_reasons": dict(reasons), "responses_with_reasoning_content": thinking_present,
-                        "returned_models": sorted({e["response"].get("model") or "unknown" for e in events}),
+                        "returned_models": sorted({e["response"].get("model") or "unknown" for e in events if "response" in e}),
                         "termination": run["termination"]})
+        if preview.get("reasoning_effort") == "low":
+            folder = root / paths["output"] / run["run"]
+            entries[-1]["exploration"] = measured_exploration(folder, events)
+            entries[-1]["inclusive_seconds"] = run["timing"]["inclusive_search_seconds"]
+            entries[-1]["returned_system_fingerprints"] = sorted({
+                raw["system_fingerprint"] for e in events
+                if isinstance(raw := e.get("response", {}).get("raw_response"), dict)
+                and isinstance(raw.get("system_fingerprint"), str)})
     ledger = inspect_ledger(root / paths["ledger"])
     complete = (len(entries) == 4 and {r["arm"] for r in entries} == set("ABCD")
                 and all(r["termination"] == "request_budget_completed" and r["metrics"]["paid_api_requests"] == 50 for r in entries)
                 and ledger["attempts"] == 200)
-    return {"kind": "thinking_four_arm_pilot", "complete": complete, "rows": entries, "ledger": ledger,
+    return {"kind": "thinking_four_arm_pilot", "reasoning_effort": preview.get("reasoning_effort"), "complete": complete, "rows": entries, "ledger": ledger,
             "all_arms_have_usable_candidates": len(entries) == 4 and all(r["metrics"].get("valid_on_probes_or_search", 0) > 0 for r in entries),
             "accounting_complete": not ledger["unknown_cost_requests"] and not ledger["unresolved_reservations"],
             "new_requests": ledger["attempts"], "new_estimated_cost_cny": ledger["accounted_cost_cny"],
@@ -195,14 +268,46 @@ def summarize(root, preview):
             "cumulative_estimated_cost_cny": preview["prior_estimated_cost_cny"] + ledger["accounted_cost_cny"],
             "prior_unknown_cost_requests": preview.get("prior_unknown_cost_requests", 0),
             "prior_unknown_reservations_cny": preview.get("prior_unknown_reservations_cny", 0),
-            "accounting_note": "Cumulative recorded amount includes any separately identified prior unknown-cost reservations; it is not a provider invoice.",
+            "prior_amounts_cny_by_ledger_status": preview.get("prior_amounts_cny_by_ledger_status"),
+            "new_amounts_cny_by_ledger_status": amounts_by_status(root, [paths["ledger"]]),
+            "accounting_note": "Recorded totals include unknown and still-reserved amounts. Only the 'known' amount is based on token usage; none is a provider invoice.",
             "heldout_evaluated": False, "formal_comparison": False,
             "warning": "Completion means the requested calls finished, not that candidates are valid or the method improved. Inspect truncations, errors and per-arm results."}
 
 
+def measured_exploration(folder, events):
+    """Use only full scores or exact-text cache hits; a probe skip has no search score."""
+    with (folder / "evaluated.jsonl").open(encoding="utf-8") as stream:
+        records = {r["id"]: r for r in map(json.loads, filter(str.strip, stream))}
+    bf = records["seed_bf"]
+    measured, novel_no_worse, reused = [], 0, set()
+    qualifying_ids = set()
+    for event in events:
+        if "response" not in event:
+            continue
+        if not event["response"].get("error"):
+            reused.update(qualifying_ids.intersection(event.get("parents", ())))
+        outcome = (records[event["representative"]] if event["status"] == "text_cache_hit"
+                   else event.get("result"))
+        if outcome is None:
+            continue
+        measured.append(outcome["mean_bins"])
+        if outcome["trace_hashes"] != bf["trace_hashes"] and outcome["mean_bins"] <= bf["mean_bins"]:
+            novel_no_worse += 1
+            if not outcome["id"].startswith("seed_"):
+                qualifying_ids.add(outcome["id"])
+    return {"requests_with_known_search_score": len(measured),
+            "best_known_generated_mean_bins": min(measured, default=None),
+            "different_trace_and_no_worse_than_bf_requests": novel_no_worse,
+            "different_trace_and_no_worse_nonseed_ids": sorted(qualifying_ids),
+            "of_these_ids_used_later_as_parent": sorted(reused),
+            "unscored_behavior_skips": sum(e["status"] == "behavior_skip" for e in events)}
+
+
 def execute(args, *, root=ROOT):
     root = Path(root).resolve()
-    config, preview = prepare(root, retry=args.retry_network_failure, direct=args.direct)
+    opts = dict(retry=args.retry_network_failure, direct=args.direct, low=args.low)
+    config, preview = prepare(root, **opts)
     paths = preview["artifacts"]
     if not args.run:
         print(json.dumps(preview, ensure_ascii=False, indent=2))
@@ -210,6 +315,8 @@ def execute(args, *, root=ROOT):
     if not preview["ready_to_start"]:
         raise ValueError("batch already claimed or outputs exist; do not reset/delete evidence: " + ", ".join(preview["blockers"]))
     check_connection()
+    if args.low:
+        print(f"DeepSeek low | A/B/C/D x50 | seed 11 | output: {paths['output']}", flush=True)
     env_name = config["api_key_env"]
     entered = False
     if not os.environ.get(env_name):
@@ -224,7 +331,7 @@ def execute(args, *, root=ROOT):
     old_cwd, claimed, start = Path.cwd(), False, time.perf_counter()
     claim = {"status": "starting", "authorized_scope": preview, "started_utc": datetime.now(timezone.utc).isoformat()}
     try:
-        current, checked = prepare(root, retry=args.retry_network_failure, direct=args.direct)
+        current, checked = prepare(root, **opts)
         if current != config or checked != preview:
             raise ValueError("source, data or prior evidence changed during key entry")
         exclusive_json(root / paths["claim"], claim)
@@ -232,12 +339,13 @@ def execute(args, *, root=ROOT):
         exclusive_json(root / paths["active"], config)
         os.chdir(root)
         import experiment
-        print("Thinking-mode pilot: A/B/C/D x50, seed11. Not a formal multi-seed result. Final tests remain sealed.", flush=True)
+        print(f"Thinking-mode pilot ({preview['reasoning_effort']}): A/B/C/D x50, seed11. Final tests remain sealed.", flush=True)
         experiment.main(["--provider", "api", "--allow-paid", "--api-config", paths["active"],
                          "--stage", "all", "--data", "data", "--out_dir", paths["output"],
                          "--arms", "A", "B", "C", "D", "--seeds", str(SEED), "--calls", str(CALLS),
                          "--islands", "4", "--reset-every", "50", "--audit-rate", "0.1",
-                         "--enhanced-prompt-version", "mechanism_v3", "--collision-policy", "disable_on_mismatch_v1"])
+                         "--enhanced-prompt-version", "mechanism_v3", "--collision-policy", "disable_on_mismatch_v1"]
+                        + (["--time-probe-setup"] if args.low else []))
         report = summarize(root, preview)
         write_json(root / paths["output"] / "thinking_summary.json", report)
         import audit_and_cost
@@ -268,7 +376,9 @@ def execute(args, *, root=ROOT):
 def main(argv=None, *, root=ROOT):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", action="store_true", help="Start the authorized 4x50 batch")
-    parser.add_argument("--retry-network-failure", action="store_true", help="Use a fresh recorded batch after the original200 SSL failures")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--low", action="store_true", help="Use the passed low16 calibration and a separate 200-request batch")
+    mode.add_argument("--retry-network-failure", action="store_true", help="Historical high-effort retry after the original200 SSL failures")
     parser.add_argument("--direct", action="store_true", help="Bypass proxies for api.deepseek.com in this process only")
     args = parser.parse_args(argv)
     with connection_route(args.direct):
