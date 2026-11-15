@@ -1,0 +1,6 @@
+Baseline correctness and search-set comparison; held-out tests remain sealed.
+development: FF=268.500, BF=263.900 bins
+search: FF=269.500, BF=265.300 bins
+D_seed33: handshake; 150 candidate requests. Frozen formal search; not a final test.
+  evaluated=75, text hits=6, behavior skips=69; API errors=0; best search=265.033
+Saved: /home/hatch/workspace/funsearch-cloud/run_warmstart_part_D_seed33_r3; no held-out test evaluation performed.

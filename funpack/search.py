@@ -7,8 +7,8 @@ from pathlib import Path
 
 from .database import Database
 from .packing import evaluate
-from .programs import BF_CODE, FF_CODE, CODE_LANGUAGE_VERSION, Program, extract_response
-from .prompts import build_messages, prompt_version
+from .programs import BF_CODE, FF_CODE, WARMSTART_SEEDS, CODE_LANGUAGE_VERSION, Program, extract_response
+from .prompts import MEMORY_VERSIONS, build_messages, memory_style, prompt_version, search_context_label
 from .providers import BudgetExceeded
 from .screening import BehavioralScreen, COLLISION_POLICIES
 from .search_context import SearchContext
@@ -39,17 +39,24 @@ def run_search(instances, probes, provider, config, out_dir):
     rng_audit = random.Random(seed + 1_000_003)
     db = Database(seed, config.get("islands", 4), config.get("temperature", 1.0))
     screen = BehavioralScreen(probes, collision_policy=collision_policy) if screening else None
-    # Compact per-run search memory (family summaries only). Only active for
-    # mechanism_v4; it observes this run's own search-set results and nothing
-    # else -- no validation, held-out, or cross-run data ever enters.
-    search_ctx = SearchContext() if enhanced_version == "mechanism_v4" else None
+    # Compact per-run search memory (family summaries only). Only active
+    # when the mode + version actually injects it (enhanced v4/v5 full
+    # block, basic v5b compact line); it observes this run's own
+    # search-set results and nothing else -- no validation, held-out, or
+    # cross-run data ever enters. Basic + v4/v5 injects nothing, so no
+    # context is created there (the v4 silent-drop trap is now a loud
+    # error in build_messages instead).
+    memory_render_style = memory_style(mode, enhanced_version)
+    search_ctx = (SearchContext(memory_version=MEMORY_VERSIONS[enhanced_version])
+                  if memory_render_style is not None else None)
     source_snapshot = source_hashes(Path(__file__).parent)
     context = digest({"search_data": instances, "language": CODE_LANGUAGE_VERSION,
                       "evaluator": EVALUATOR_VERSION, "source_hashes": source_snapshot,
                       "evaluation_timeout_seconds": config.get("evaluation_timeout_seconds", 30)})
     method = {"prompt_version": version, "enhanced_prompt_version": enhanced_version,
               "screening_enabled": screening, "collision_policy": collision_policy if screening else "off",
-              "search_context": "mechanism_v4_memory_v1" if enhanced_version == "mechanism_v4" else "off"}
+              "search_context": (search_context_label(enhanced_version)
+                                if memory_render_style is not None else "off")}
     provenance = {"config": config, "method": method, "environment": environment(), "search_context_hash": context,
                   "search_hash": digest(instances),
                   "probe_hash": digest(probes), "source_hashes": source_snapshot,
@@ -96,7 +103,14 @@ def run_search(instances, probes, provider, config, out_dir):
         append_jsonl(out_dir / "evaluated.jsonl", record)
         return record
 
-    for name, code in (("seed_ff", FF_CODE), ("seed_bf", BF_CODE)):
+    # Warm-start seeds (mechanism_v3c only): the sealed formal winners join
+    # FF/BF in every island, so parent sampling can combine verified-good
+    # mechanisms. The seed set is pinned by the prompt version, which the
+    # frozen protocol records; every other version keeps exactly FF/BF.
+    seed_programs = [("seed_ff", FF_CODE), ("seed_bf", BF_CODE)]
+    if enhanced_version == "mechanism_v3c":
+        seed_programs += [("seed_warmstart_" + name, code) for name, code in WARMSTART_SEEDS]
+    for name, code in seed_programs:
         program = Program(code)
         metrics["seed_full_evaluations"] += 1
         record = full_record(code, program, name)
@@ -111,7 +125,12 @@ def run_search(instances, probes, provider, config, out_dir):
     termination = "request_budget_completed"
     for request_index in range(1, calls + 1):
         island, parents = db.parents()
-        rendered_context = search_ctx.render() if search_ctx is not None else None
+        if search_ctx is None:
+            rendered_context = None
+        elif memory_render_style == "compact":
+            rendered_context = search_ctx.render_compact()
+        else:
+            rendered_context = search_ctx.render()
         messages = build_messages(mode, parents, enhanced_version=enhanced_version,
                                   search_context=rendered_context)
         context_words = len(rendered_context.split()) if rendered_context else 0

@@ -1,0 +1,91 @@
+2026-11-15 14:28:08 coordinator start: existing responses seed11=0, seed22=0, seed33=0
+2026-11-15 14:28:08 C_seed33 request_000001 idx=1 answered after 2 attempts [BF+modres%5+tri+tri[5,25]@15]
+2026-11-15 14:28:13 C_seed33 request_000002 idx=2 answered after 3 attempts [sqrt+gapmod%5+tight<=12]
+2026-11-15 14:28:23 C_seed11 request_000004 idx=4 answered after 2 attempts [BF+band//8-+loose>=45]
+2026-11-15 14:28:33 C_seed11 request_000006 idx=6 answered after 2 attempts [worst+ratio>=0.75+tri+tri[10,30]@20]
+2026-11-15 14:28:38 C_seed11 request_000007 idx=7 answered after 2 attempts [BF+exact+half+half&win[28,42]]
+2026-11-15 14:28:38 C_seed22 request_000007 idx=7 answered after 2 attempts [BF+band//5++tight<=8]
+2026-11-15 14:28:53 C_seed22 request_000010 idx=10 answered after 3 attempts [sqrt+band//5++frac(item/5,item/2)]
+2026-11-15 14:28:58 C_seed11 request_000011 idx=11 answered after 4 attempts [worst+band//12++modres%10]
+2026-11-15 14:28:58 C_seed22 request_000011 idx=11 answered after 2 attempts [BF+mod4=1+mod4=1&win[20,32]+win+win[20,32]+25]
+2026-11-15 14:29:18 C_seed11 request_000015 idx=15 answered after 2 attempts [BFx2+band//8++win+win[28,46]+25]
+2026-11-15 14:29:23 C_seed11 request_000016 idx=16 answered after 2 attempts [BF+frac(item/4,item/3)+tight<=12]
+2026-11-15 14:29:33 C_seed33 request_000018 idx=18 answered after 2 attempts [log+exact+loose>=40+tri+tri[10,30]@20]
+2026-11-15 14:29:38 C_seed22 request_000019 idx=19 answered after 2 attempts [sqrt+band//10++half+half&win[25,39]]
+2026-11-15 14:29:48 C_seed11 request_000021 idx=21 answered after 2 attempts [quad/50+modres%10+ratio>=0.75]
+2026-11-15 14:29:58 C_seed33 request_000023 idx=23 answered after 2 attempts [BF+loose>=40+modres%10]
+2026-11-15 14:30:13 progress seed11: 25/150 responses (total answered this run: 73, rewrites: 19, distinct families: 73)
+2026-11-15 14:30:13 progress seed22: 25/150 responses (total answered this run: 74, rewrites: 19, distinct families: 74)
+2026-11-15 14:30:13 C_seed33 request_000025 idx=25 answered after 2 attempts [BF+frac(item/3,item/1)+modres%10]
+2026-11-15 14:30:13 progress seed33: 25/150 responses (total answered this run: 75, rewrites: 20, distinct families: 75)
+2026-11-15 14:30:34 C_seed11 request_000029 idx=29 answered after 2 attempts [flat/4+half+half&win[28,43]+modres%10]
+2026-11-15 14:30:39 C_seed33 request_000030 idx=30 answered after 2 attempts [BFx2+frac(item/4,item/2)+win+win[30,40]+25]
+2026-11-15 14:30:44 C_seed33 request_000031 idx=31 answered after 2 attempts [worst+half+half&win[25,40]+loose>=40+modres%5]
+2026-11-15 14:31:04 C_seed22 request_000035 idx=35 answered after 2 attempts [quad/100+loose>=60+modres%10+win+win[28,40]-8]
+2026-11-15 14:31:09 C_seed22 request_000036 idx=36 answered after 2 attempts [flip<=10+frac(item/3,item/2)+frac(item/5,item/2)+mod3=0+mod3=0&win[20,35]]
+2026-11-15 14:31:09 C_seed33 request_000036 idx=36 answered after 2 attempts [BF+loose>=40+loose>=45]
+2026-11-15 14:31:29 C_seed11 request_000040 idx=40 answered after 3 attempts [flip<=12+frac(item/3,item/1)+mod3=1+mod3=1&win[20,35]]
+2026-11-15 14:31:49 C_seed22 request_000044 idx=44 answered after 2 attempts [BF+loose>=50+ratio>=0.80+tight<=10]
+2026-11-15 14:31:54 C_seed11 request_000044 idx=44 answered after 2 attempts [BF+band//5-+loose>=45]
+2026-11-15 14:32:14 C_seed11 request_000047 idx=47 answered after 2 attempts [BFx3+frac(item/4,item/3)+modres%10+tight<=10]
+2026-11-15 14:32:19 C_seed11 request_000048 idx=48 answered after 2 attempts [flip<=10+frac(item/4,item/2)+ratio>=0.80+win+win[8,26]+15]
+2026-11-15 14:32:24 progress seed22: 50/150 responses (total answered this run: 147, rewrites: 32, distinct families: 147)
+2026-11-15 14:32:29 C_seed11 request_000050 idx=50 answered after 2 attempts [BFx2+exact+gapmod%10+modres%10]
+2026-11-15 14:32:29 progress seed11: 50/150 responses (total answered this run: 149, rewrites: 33, distinct families: 149)
+2026-11-15 14:32:29 C_seed33 request_000050 idx=50 answered after 2 attempts [worst+loose>=45+modres%5]
+2026-11-15 14:32:29 progress seed33: 50/150 responses (total answered this run: 151, rewrites: 34, distinct families: 151)
+2026-11-15 14:32:39 C_seed11 request_000052 idx=52 answered after 2 attempts [flat/2+ratio>=0.50+win+win[12,27]+25]
+2026-11-15 14:33:04 C_seed11 request_000057 idx=57 answered after 2 attempts [quad/100+exact+mod3=1&win[28,43]+modres%5]
+2026-11-15 14:33:24 C_seed22 request_000062 idx=62 answered after 2 attempts [BF+band//10-+frac(item/4,item/2)+gapmod%10]
+2026-11-15 14:33:29 C_seed33 request_000062 idx=62 answered after 4 attempts [worst+frac(item/4,item/3)+gapmod%10]
+2026-11-15 14:33:34 C_seed22 request_000064 idx=64 answered after 2 attempts [BF+band//12++exact]
+2026-11-15 14:33:39 C_seed33 request_000064 idx=64 answered after 2 attempts [worst+half+half&win[28,43]+loose>=60]
+2026-11-15 14:33:59 C_seed11 request_000068 idx=68 answered after 2 attempts [sqrt+gapmod%5+modres%10]
+2026-11-15 14:34:19 C_seed11 request_000072 idx=72 answered after 2 attempts [flip<=10+mod4=1+mod4=1&win[30,45]+modres%5+tight<=10]
+2026-11-15 14:34:24 C_seed11 request_000073 idx=73 answered after 3 attempts [sqrt+frac(item/3,item/2)+mod3=1+mod3=1&win[28,46]]
+2026-11-15 14:34:29 progress seed22: 75/150 responses (total answered this run: 220, rewrites: 46, distinct families: 218)
+2026-11-15 14:34:34 progress seed11: 75/150 responses (total answered this run: 222, rewrites: 46, distinct families: 220)
+2026-11-15 14:34:44 C_seed11 request_000077 idx=77 answered after 2 attempts [log+exact+loose>=40+win+win[6,14]+20]
+2026-11-15 14:34:44 progress seed33: 75/150 responses (total answered this run: 230, rewrites: 47, distinct families: 228)
+2026-11-15 14:34:49 C_seed11 request_000078 idx=78 answered after 2 attempts [worst+loose>=45+modres%10]
+2026-11-15 14:35:04 C_seed33 request_000079 idx=79 answered after 3 attempts [log+frac(item/4,item/2)+half+half&win[25,37]+tight<=12]
+2026-11-15 14:35:34 C_seed33 request_000085 idx=85 answered after 2 attempts [BFx2+band//5-+tight<=5]
+2026-11-15 14:35:39 C_seed22 request_000088 idx=88 answered after 2 attempts [quad/50+mod3=0+mod3=0&win[25,43]+mod4=2+mod4=2&win[30,48]]
+2026-11-15 14:35:49 C_seed22 request_000090 idx=90 answered after 2 attempts [flat/2+tight<=12+tri+tri[5,25]@15]
+2026-11-15 14:35:49 C_seed33 request_000087 idx=87 answered after 2 attempts [BF+band//10-+half+half&win[28,40]]
+2026-11-15 14:36:04 C_seed11 request_000091 idx=91 answered after 2 attempts [quad/200+modres%10+ratio>=0.50]
+2026-11-15 14:36:04 C_seed33 request_000090 idx=90 answered after 2 attempts [BF+loose>=40+ratio>=0.50]
+2026-11-15 14:36:09 C_seed11 request_000092 idx=92 answered after 2 attempts [BF+band//8-+win+win[6,21]+12]
+2026-11-15 14:36:09 C_seed22 request_000094 idx=94 answered after 2 attempts [sqrt+band//8++exact]
+2026-11-15 14:36:14 C_seed22 request_000095 idx=95 answered after 2 attempts [BFx2+loose>=45+mod5=0&win[28,40]+tri+tri[15,35]@25]
+2026-11-15 14:36:39 progress seed22: 100/150 responses (total answered this run: 294, rewrites: 59, distinct families: 292)
+2026-11-15 14:36:49 progress seed11: 100/150 responses (total answered this run: 299, rewrites: 59, distinct families: 297)
+2026-11-15 14:36:54 progress seed33: 100/150 responses (total answered this run: 304, rewrites: 59, distinct families: 302)
+2026-11-15 14:36:59 C_seed33 request_000101 idx=101 answered after 2 attempts [worst+band//8++modres%10]
+2026-11-15 14:37:04 C_seed22 request_000105 idx=105 answered after 2 attempts [BF+band//8-+frac(item/4,item/3)+mod5=1+mod5=1&win[20,35]]
+2026-11-15 14:37:14 C_seed22 request_000107 idx=107 answered after 3 attempts [sqrt+band//12++gapmod%5+win[10,25]+12]
+2026-11-15 14:37:44 C_seed22 request_000113 idx=113 answered after 3 attempts [quad/200+ratio>=0.80+tri+tri[10,30]@20+win+win[30,40]+25]
+2026-11-15 14:37:49 C_seed11 request_000112 idx=112 answered after 2 attempts [sqrt+band//12++exact+tight<=12]
+2026-11-15 14:38:14 C_seed22 request_000118 idx=118 answered after 2 attempts [worst+frac(item/4,item/2)+win+win[6,24]+18]
+2026-11-15 14:38:40 C_seed22 request_000123 idx=123 answered after 2 attempts [flip<=10+half+half&win[28,42]+tri+tri[15,35]@25]
+2026-11-15 14:38:50 progress seed22: 125/150 responses (total answered this run: 370, rewrites: 68, distinct families: 363)
+2026-11-15 14:38:55 progress seed11: 125/150 responses (total answered this run: 372, rewrites: 68, distinct families: 365)
+2026-11-15 14:39:00 C_seed22 request_000127 idx=127 answered after 2 attempts [flip<=12+exact+mod4=0+mod4=0&win[25,37]]
+2026-11-15 14:39:05 progress seed33: 125/150 responses (total answered this run: 380, rewrites: 69, distinct families: 373)
+2026-11-15 14:39:10 C_seed11 request_000128 idx=128 answered after 2 attempts [log+loose>=40+tri+tri[10,30]@20]
+2026-11-15 14:39:15 C_seed22 request_000130 idx=130 answered after 2 attempts [log+half+half&win[25,39]+tight<=15]
+2026-11-15 14:39:25 C_seed22 request_000132 idx=132 answered after 2 attempts [sqrt+tri+tri[25,45]@35+win+win[28,40]+8]
+2026-11-15 14:39:30 C_seed22 request_000133 idx=133 answered after 2 attempts [BF+band//12++exact]
+2026-11-15 14:39:45 C_seed11 request_000135 idx=135 answered after 2 attempts [log+exact+modres%5+tri+tri[5,25]@15]
+2026-11-15 14:39:55 C_seed11 request_000136 idx=136 answered after 2 attempts [BF+mod4=0+mod4=0&win[30,48]+ratio>=0.50]
+2026-11-15 14:40:00 C_seed22 request_000139 idx=139 answered after 2 attempts [BF+modres%5+win+win[10,25]+30]
+2026-11-15 14:40:05 C_seed22 request_000140 idx=140 answered after 2 attempts [quad/200+modres%10+tri+tri[15,35]@25]
+2026-11-15 14:40:35 C_seed22 request_000146 idx=146 answered after 2 attempts [sqrt+loose>=40+tri+tri[20,40]@30]
+2026-11-15 14:40:40 C_seed33 request_000143 idx=143 answered after 2 attempts [worst+mod3=2+mod3=2&win[20,38]+mod5=3+mod5=3&win[28,40]+tri[5,25]@15]
+2026-11-15 14:40:55 progress seed22: 150/150 responses (total answered this run: 441, rewrites: 79, distinct families: 433)
+2026-11-15 14:41:10 progress seed11: 150/150 responses (total answered this run: 447, rewrites: 79, distinct families: 439)
+2026-11-15 14:41:20 progress seed33: 150/150 responses (total answered this run: 450, rewrites: 79, distinct families: 442)
+2026-11-15 14:41:20 ALL DONE: seed11=150, seed22=150, seed33=150
+2026-11-15 14:41:20 stats: answered=450 rewrites=79 failed=0 distinct-families=442
+2026-11-15 14:41:20 rewrite reasons: {'order-equivalent-to-BF': 78, 'duplicate-of-parent-or-emitted': 1}
+2026-11-15 14:41:20 top families: [('BF+loose>=50+tri+tri[5,25]@15', 2), ('BF+loose>=40+modres%10', 2), ('BF+frac(item/3,item/2)+modres%5', 2), ('worst+ratio>=0.60+tight<=8', 2), ('worst+band//8++modres%10', 2), ('flip<=12+half+half&win[28,42]+loose>=50', 2), ('sqrt+half+half&win[25,40]+ratio>=0.75', 2), ('BF+band//12++exact', 2), ('flip<=8+ratio>=0.50+win+win[25,33]+25', 1), ('log+mod3=0+mod3=0&win[25,40]+tri+tri[30,50]@40', 1), ('BF+modres%5+tri+tri[5,25]@15', 1), ('BF+ratio>=0.70+win+win[12,20]+30', 1), ('BF+exact+frac(item/4,item/3)', 1), ('sqrt+gapmod%5+tight<=12', 1), ('log+frac(item/4,item/3)+loose>=40+tri+tri[20,40]@30', 1)]

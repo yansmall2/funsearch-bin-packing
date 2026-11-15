@@ -25,6 +25,23 @@ MAX_RESPONSE_CHARS = 65_536
 FF_CODE = "def priority(item, bins):\n    return [0.0 for r in bins]\n"
 BF_CODE = "def priority(item, bins):\n    return [-(r - item) for r in bins]\n"
 
+# Warm-start seeds for the combination study (mechanism_v3c): the validation-
+# selected winners of the sealed formal study (protocol 3eb1f24d...), read
+# verbatim from candidates-sealed.json and deduplicated by code. B's winner
+# is identical in all three seeds and C's in two, so 12 winners collapse to
+# 9 distinct programs. Each entry is named after its first sealed run.
+WARMSTART_SEEDS = (
+    ("A_seed11", 'def priority(item, bins):\n    return [200 - 2 * (r - item) if r - item <= 10 else (r - item) for r in bins]\n'),
+    ("B_seed11", 'def priority(item, bins):\n    return [-(r - item) + (15 if r - item >= 28 and r - item <= 48 else 0) - (15 if r - item >= 8 and r - item <= 22 else 0) for r in bins]\n'),
+    ("C_seed11", 'def priority(item, bins):\n    return [-(r - item) + (20 if 30 <= r - item <= 45 and item % 3 == 1 else 0) - (20 if 8 <= r - item <= 22 else 0) for r in bins]\n'),
+    ("D_seed11", 'def priority(item, bins):\n    return [-(r - item) + (item / 2 if r - item >= 28 and r - item <= 42 else 0) - (item / 2 if r - item >= 6 and r - item <= 20 else 0) for r in bins]\n'),
+    ("A_seed22", 'def priority(item, bins):\n    return [100 - (r - item) if r - item <= 12 else (r - item) for r in bins]\n'),
+    ("D_seed22", 'def priority(item, bins):\n    return [-(r - item) + (25 if 30 <= r - item <= 45 else 0) - (25 if 10 <= r - item <= 20 else 0) for r in bins]\n'),
+    ("A_seed33", 'def priority(item, bins):\n    return [-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0) for r in bins]\n'),
+    ("C_seed33", 'def priority(item, bins):\n    return [-(r - item) + (20 if 30 <= r - item <= 48 and item % 3 == 1 else 0) - (20 if 8 <= r - item <= 22 else 0) for r in bins]\n'),
+    ("D_seed33", 'def priority(item, bins):\n    return [-(r - item) + (30 - abs((r - item) - 35) if 25 <= r - item <= 45 else 0) for r in bins]\n'),
+)
+
 
 class ProgramError(ValueError):
     """Invalid source, invalid output, or a resource/numeric limit violation."""

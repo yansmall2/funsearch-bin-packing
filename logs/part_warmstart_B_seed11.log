@@ -1,0 +1,4 @@
+Baseline correctness and search-set comparison; held-out tests remain sealed.
+development: FF=268.500, BF=263.900 bins
+search: FF=269.500, BF=265.300 bins
+B_seed11: handshake; 150 candidate requests. Frozen formal search; not a final test.
