@@ -1,0 +1,18 @@
+{
+  "request_id": "request_000078",
+  "request_index": 78,
+  "messages": [
+    {
+      "role": "system",
+      "content": "Design a deterministic online bin-packing heuristic. You are given the current item's size and only feasible existing bins' remaining capacities. Return one score per feasible bin; higher wins and ties choose the first bin. The evaluator opens a new bin only when no existing bin fits. Minimize the number of bins used across the search instances. You cannot see future items.\n\nReturn exactly one function: def priority(item, bins):. item is the current positive integer item size; bins is a list of feasible bin residual capacities. Return a numeric list with exactly len(bins) scores, in input order; larger scores are preferred and ties use the earliest bin. The evaluator handles feasibility and opening bins. Use only numeric local assignments, if/else, return, numeric list literals, single-generator list comprehensions over bins or numeric lists, optional comprehension filters, integer list indexing, + - * / // % **, numerical comparisons, and/or/not, and conditional expressions. Permitted calls: abs, min, max, sum, len, round, sqrt, log, exp (no keywords). No imports, attributes, strings, general loops, recursion, external state, list multiplication, generators, or other calls. Do not rebind item, bins, priority, or helper names. Use ASCII-letter-starting names of <=64 characters. All numeric intermediates must be finite with absolute value <=1e12; power requires abs(base)<=1e6 and abs(exponent)<=12; round digits are integers between -12 and 12; exp requires abs(argument)<=100. Source limit 12 KiB, AST limit 1024 nodes/depth 40, list limit 4096, evaluation limit 50000 steps. Language version: funpack-dsl-1."
+    },
+    {
+      "role": "user",
+      "content": "Below are previously evaluated candidate functions and their search-set bin counts or mean bin count (lower is better). These are search feedback, not test-set results. Propose one useful variation.\n[{\"code\": \"def priority(item, bins):\\n    return [-(r - item) + (15 if (r - item) % 16 == 0 else 0) for r in bins]\\n\", \"counts\": [262, 265, 274, 268, 273, 289, 272, 264, 269, 271, 268, 261, 262, 257, 267, 260, 255, 264, 260, 254, 268, 265, 273, 272, 262, 266, 264, 268, 275, 266], \"mean_bins\": 266.46666666666664}, {\"code\": \"def priority(item, bins):\\n    return [100 - (r - item) if r - item <= 12 else (r - item) for r in bins]\\n\", \"counts\": [260, 263, 271, 268, 272, 289, 271, 262, 269, 271, 266, 260, 259, 255, 267, 259, 254, 262, 260, 253, 267, 263, 272, 270, 261, 265, 263, 267, 273, 263], \"mean_bins\": 265.1666666666667}]\n\nReturn only the Python function in one ```python code block."
+    }
+  ],
+  "messages_hash": "2a0d3bbc4edf02c09d6053bfdff8442bfe2a34d37034b119078eeb2cf4fbbf33",
+  "created_at": 1794736281.6864922,
+  "generator": "muse-spark-1.3",
+  "expect": "response JSON object with a 'text' string: Strategy + one python block (enhanced) or one python block only (basic)"
+}

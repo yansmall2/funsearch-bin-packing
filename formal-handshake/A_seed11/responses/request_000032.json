@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if 27 <= r - item <= 46 else 0) - (24 if 7 <= r - item <= 19 else 0) for r in bins]\n```"}

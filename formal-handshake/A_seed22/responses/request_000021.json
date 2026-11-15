@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item - 55) ** 2 for r in bins]\n```"}
