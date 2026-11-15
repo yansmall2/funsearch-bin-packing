@@ -1,0 +1,51 @@
+{
+  "config": {
+    "arm": "D",
+    "seed": 11,
+    "calls": 150,
+    "islands": 4,
+    "reset_every": 50,
+    "audit_rate": 0.1,
+    "temperature": 1.0,
+    "enhanced_prompt_version": "mechanism_v3c",
+    "collision_policy": "disable_on_mismatch_v1",
+    "evaluation_timeout_seconds": 30,
+    "protocol_id": "09cdd13bc48fa6e06ed92577dea70f690ccf810ce8040219faaed64e983c9280"
+  },
+  "method": {
+    "prompt_version": "mechanism_v3c",
+    "enhanced_prompt_version": "mechanism_v3c",
+    "screening_enabled": true,
+    "collision_policy": "disable_on_mismatch_v1",
+    "search_context": "off"
+  },
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "executable": "/usr/bin/python3",
+    "platform": "Linux-7.0.0-44-generic-x86_64-with-glibc2.39",
+    "utc_time": "2026-11-15T15:31:34.673194+00:00"
+  },
+  "search_context_hash": "548fb846f0dcafcd536cf6d062259e7c40ae8e0dfac2c287cec882a9bef15ed8",
+  "search_hash": "ef0f42e06ce9cb9354f3dea83382643cc143fdcd640595171ea01abf9c476a97",
+  "probe_hash": "e8b5c75384b4c67d208b4d0af353e499f58954e4326ca2dce1ca4ec1d15a2511",
+  "source_hashes": {
+    "__init__.py": "720e69c3b56cb12c0f62b7908cc92843ff350e11a46db12361f8320fcff33c48",
+    "data.py": "0e4199f74105c88cf4fcfe69b1cd5a85bb1b097ff7c2bce8083be1c691fca4dc",
+    "database.py": "28ea4b08bf322ded891411539702171314e0dd08938b0b392b6ba0ca1b45df0e",
+    "handshake_provider.py": "c345dfed8f78d8ce1752354bb76c8da9e18098a4d7e9dd9396433160e9588bf5",
+    "ledger.py": "8716a57ef4a96d371e41ac2dbe238ca0d950f61daf1f5cf329dda125c7fb8c31",
+    "packing.py": "70ad438ee4b954df903decbe601b8ebf07b0d5e6dfd284418608e7c385ab9ee3",
+    "programs.py": "4f37058ba78257effbdd816bb96cb5a96b700400104210751a92b792753127c0",
+    "prompts.py": "0b19f83d23a125cc731bbb930efbe4cfe974f01216b6a91daf605f7fc108c271",
+    "protocol.py": "f3c36be83dca898882142c44d1573b5c7b0e0a257565c2588b7550b40c74183a",
+    "providers.py": "71a17a703f9acf83bfefdcb6a6c0c3f33fb42173e52f3e4c8f3318c7612b686b",
+    "screening.py": "722fb103769b47e1f27e3a089d53d18b271cf5327b7d5d8c1a28d2b6ebca11ac",
+    "search.py": "7148c9daf5a731324ae5ac96601845df5a5f6ab4751da831cfad04a63e222c92",
+    "search_context.py": "da5f0f7c55170880b9eee8e59389a955c26b09a543c62e572c5f259319a56ccf",
+    "storage.py": "5f412b8386cfcff903b10339f3c0649868db0450ac9c673674e639db829e8000"
+  },
+  "dataset_role": "search",
+  "heldout_evaluated": false,
+  "provider_class": "HandshakeProvider",
+  "evidence_scope": "formal_comparison"
+}
