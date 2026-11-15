@@ -14,10 +14,15 @@ instead of explore. This module keeps a small structured summary instead:
   fallback).
   Bonus sizes and constants do NOT define a family; retuning a constant
   inside the same windows is the same family.
-- Select: render() emits at most MAX_WORDS words, priority order:
-  saturated families first (as an avoid-list), then the best family,
-  then archetypes untried in this run. Lowest-priority lines are dropped
-  first when the budget binds.
+- Select: render() emits at most MAX_WORDS words. Two memory semantics
+  exist. v1 (mechanism_v4): saturated families first (as an avoid-list),
+  then the best family, then archetypes untried in this run. v2
+  (mechanism_v5): the best family is labelled "refine, do not avoid";
+  only families that are saturated AND worse than the current best are
+  avoided. Lowest-priority lines are dropped first when the budget binds.
+  render_compact() is the v2 semantics as one short line for basic prompts,
+  which have no Strategy text.
+- Update: incremental, O(1) per observation; no re-scan of history.
 - Update: incremental, O(1) per observation; no re-scan of history.
 - Scope: one run only; only search-set means enter. Validation, held-out
   and test results never enter, exactly like parent feedback.
@@ -28,9 +33,14 @@ from __future__ import annotations
 import ast
 
 DEFAULT_MAX_WORDS = 120
+DEFAULT_COMPACT_MAX_WORDS = 40
 SATURATED_TRIES = 3
 MAX_SATURATED_LINES = 3
 MAX_UNTRIED_LINES = 2
+MAX_COMPACT_AVOID = 2
+MEMORY_VERSION_V1 = "v1"
+MEMORY_VERSION_V2 = "v2"
+MEMORY_VERSIONS = (MEMORY_VERSION_V1, MEMORY_VERSION_V2)
 
 # Fixed archetype vocabulary, used only to name structures with zero tries
 # in this run. These are suggestions for unexplored regions, not claims.
@@ -194,12 +204,22 @@ def classify(code):
 
 
 class SearchContext:
-    """Per-run family table with a hard word budget on rendering."""
+    """Per-run family table with a hard word budget on rendering.
 
-    def __init__(self, max_words=DEFAULT_MAX_WORDS):
+    memory_version "v1" is the mechanism_v4 semantics (saturated families
+    are avoided, best family listed). "v2" is the mechanism_v5 semantics
+    (best family is labelled refinable, never avoided; only saturated
+    families worse than the best are avoided). v1 is the default so
+    existing v4 behaviour is unchanged.
+    """
+
+    def __init__(self, max_words=DEFAULT_MAX_WORDS, memory_version=MEMORY_VERSION_V1):
         if type(max_words) is not int or max_words < 20:
             raise ValueError("max_words must be an int >= 20")
+        if memory_version not in MEMORY_VERSIONS:
+            raise ValueError("unknown memory_version")
         self.max_words = max_words
+        self.memory_version = memory_version
         self.families = {}
         self.total = 0
 
@@ -214,31 +234,73 @@ class SearchContext:
     def _word_count(self, text):
         return len(text.split())
 
-    def render(self):
-        lines = ["Search memory (this run only; search-set means, lower is better):"]
-        saturated = sorted(
+    def _best(self):
+        return min(self.families.items(), key=lambda kv: (kv[1]["best"], -kv[1]["tries"]))
+
+    def _saturated_and_worse(self):
+        """Saturated families strictly worse than the current best.
+
+        The best family itself is never in this list, even when saturated:
+        that is the v2 fix -- "saturated" no longer means "do not retry"
+        for the family that is currently winning.
+        """
+        if not self.families:
+            return []
+        _, best_row = self._best()
+        return sorted(
+            ((sig, row) for sig, row in self.families.items()
+             if row["tries"] >= SATURATED_TRIES and row["best"] > best_row["best"]),
+            key=lambda kv: (-kv[1]["tries"], kv[1]["best"]),
+        )[:MAX_SATURATED_LINES]
+
+    def _saturated(self):
+        return sorted(
             ((sig, row) for sig, row in self.families.items() if row["tries"] >= SATURATED_TRIES),
             key=lambda kv: (-kv[1]["tries"], kv[1]["best"]),
         )[:MAX_SATURATED_LINES]
-        for sig, row in saturated:
-            lines.append(f"Avoid re-trying {sig}: tried {row['tries']}x, best {row['best']:.3f}.")
-        if self.families:
-            best_sig, best_row = min(
-                self.families.items(), key=lambda kv: (kv[1]["best"], -kv[1]["tries"])
-            )
-            lines.append(f"Best so far: {best_sig} ({best_row['best']:.3f}).")
+
+    def _untried_labels(self):
         tried_flags = set()
         for sig in self.families:
             for flag in sig.split("+"):
                 if flag.startswith("windows"):
                     continue
                 tried_flags.add(flag)
-        untried = [label for label, flag in ARCHETYPES if flag not in tried_flags]
-        for label in untried[:MAX_UNTRIED_LINES]:
+        return [label for label, flag in ARCHETYPES if flag not in tried_flags]
+
+    def render(self):
+        if self.memory_version == MEMORY_VERSION_V2:
+            return self._render_v2()
+        return self._render_v1()
+
+    def _render_v1(self):
+        lines = ["Search memory (this run only; search-set means, lower is better):"]
+        for sig, row in self._saturated():
+            lines.append(f"Avoid re-trying {sig}: tried {row['tries']}x, best {row['best']:.3f}.")
+        if self.families:
+            best_sig, best_row = self._best()
+            lines.append(f"Best so far: {best_sig} ({best_row['best']:.3f}).")
+        for label in self._untried_labels()[:MAX_UNTRIED_LINES]:
             lines.append(f"Untried here: {label}.")
+        return self._enforce_budget(lines)
+
+    def _render_v2(self):
+        lines = ["Search memory (this run only; search-set means, lower is better):"]
+        if self.families:
+            best_sig, best_row = self._best()
+            lines.append(f"Refine the best family: {best_sig} ({best_row['best']:.3f}); "
+                         "vary its constants or combine it with another idea.")
+        for sig, row in self._saturated_and_worse():
+            lines.append(f"Avoid re-trying {sig}: tried {row['tries']}x, best {row['best']:.3f}.")
+        for label in self._untried_labels()[:MAX_UNTRIED_LINES]:
+            lines.append(f"Untried here: {label}.")
+        return self._enforce_budget(lines)
+
+    def _enforce_budget(self, lines):
         # Enforce the hard budget by dropping lowest-priority lines first
         # (untried hints, then saturated lines beyond the first). Header and
-        # best-so-far are never dropped. Recompute each round: indices shift.
+        # best-so-far / refine line are never dropped. Recompute each round:
+        # indices shift.
         text = "\n".join(lines)
         while self._word_count(text) > self.max_words:
             untried_idx = [i for i, line in enumerate(lines) if line.startswith("Untried here:")]
@@ -252,9 +314,32 @@ class SearchContext:
             text = "\n".join(lines)
         return text
 
+    def render_compact(self, max_words=DEFAULT_COMPACT_MAX_WORDS):
+        """v2 semantics as one short line, for basic prompts.
+
+        Basic prompts have no Strategy text, so the memory must fit in a
+        single instruction line. The refine part is never dropped; avoid
+        parts are dropped last-first when the budget binds.
+        """
+        if type(max_words) is not int or max_words < 20:
+            raise ValueError("max_words must be an int >= 20")
+        if not self.families:
+            return "Search memory (this run only): no observations yet."
+        best_sig, best_row = self._best()
+        parts = [f"refine {best_sig} ({best_row['best']:.3f})"]
+        for sig, row in self._saturated_and_worse()[:MAX_COMPACT_AVOID]:
+            parts.append(f"avoid {sig} ({row['tries']}x, {row['best']:.3f})")
+        header = "Search memory (this run only; search-set means, lower is better):"
+        text = header + " " + "; ".join(parts) + "."
+        while self._word_count(text) > max_words and len(parts) > 1:
+            parts.pop()
+            text = header + " " + "; ".join(parts) + "."
+        return text
+
     def to_dict(self):
         return {
             "max_words": self.max_words,
+            "memory_version": self.memory_version,
             "total": self.total,
             "families": {
                 sig: {"tries": row["tries"], "best": row["best"]}
@@ -264,7 +349,8 @@ class SearchContext:
 
     @classmethod
     def from_dict(cls, data):
-        context = cls(max_words=data["max_words"])
+        context = cls(max_words=data["max_words"],
+                      memory_version=data.get("memory_version", MEMORY_VERSION_V1))
         context.total = data["total"]
         context.families = {
             sig: {"tries": row["tries"], "best": row["best"]}

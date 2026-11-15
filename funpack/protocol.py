@@ -18,7 +18,7 @@ from pathlib import Path
 from .data import load_instances, load_probes
 from .packing import evaluate
 from .programs import BF_CODE, FF_CODE, Program
-from .prompts import ENHANCED_VERSIONS, prompt_version
+from .prompts import ENHANCED_VERSIONS, memory_style, prompt_version, search_context_label
 from .screening import COLLISION_POLICIES
 from .providers import _contains_secret_field, preflight
 from .storage import digest, environment, read_json, write_json
@@ -356,8 +356,12 @@ def _inspect_study(protocol, study_dir):
                                "enhanced_prompt_version": plan["enhanced_prompt_version"],
                                "screening_enabled": arm in "CD",
                                "collision_policy": plan["collision_policy"] if arm in "CD" else "off",
-                               "search_context": ("mechanism_v4_memory_v1"
-                                                  if plan["enhanced_prompt_version"] == "mechanism_v4" else "off")}
+                               # Same style-gated derivation as search.py: a
+                               # basic arm with a v4/v5 plan injects no memory.
+                               "search_context": (search_context_label(plan["enhanced_prompt_version"])
+                                                  if memory_style("enhanced" if arm in "BD" else "basic",
+                                                                  plan["enhanced_prompt_version"]) is not None
+                                                  else "off")}
             _require(record.get("method") == expected_method, "run method versions differ from protocol")
             _require(record.get("config") == config
                      and record.get("provider_class") == ("HandshakeProvider" if handshake else "ApiProvider")

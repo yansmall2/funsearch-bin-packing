@@ -1,0 +1,32 @@
+{"request_index": 1, "mechanism": "triangular peak: prefer post-placement residual nearest item/2", "family": "triangular peak"}
+{"request_index": 2, "mechanism": "count-gated band bonus on BF: +20 if >=3 bins and leftover in [item/2, item]", "family": "count-gated bands + plain"}
+{"request_index": 3, "mechanism": "BF blended with distribution-midpoint penalty: -(r-item) - |r-mid|/2, mid=(min+max)/2", "family": "distribution-relative windows + plain"}
+{"request_index": 4, "mechanism": "exact-fit bonus + worst-fit fallback: 1000 if r==item else r", "family": "exact-fit bonus + worst-fit"}
+{"request_index": 5, "mechanism": "BF + sliver penalty: -30 if 0 < leftover < item/4", "family": "sliver penalty + plain"}
+{"request_index": 6, "mechanism": "ratio-gated: roomy bins (r>=2*item) worst-fit wins, tight bins BF but lose to roomy", "family": "ratio-gated bounds + plain"}
+{"request_index": 7, "mechanism": "BF minus 50 penalty on the tightest bin (min residual), second-tightest wins", "family": "skip-tightest + plain"}
+{"request_index": 8, "mechanism": "item-size gate: worst-fit if item*3<=max(bins), else BF", "family": "item-size gate + plain"}
+{"request_index": 9, "mechanism": "dist+worst_fit refined: exact-fit bonus 10000 + spread gate (worst-fit if spread>=item else BF)", "family": "dist+worst_fit"}
+{"request_index": 10, "mechanism": "dist+worst_fit refined: mean-targeting -|r-mean| + exact-fit bonus 10000", "family": "dist+worst_fit"}
+{"request_index": 11, "mechanism": "dist+worst_fit refined: count gate (worst-fit if >=4 bins else BF) + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 12, "mechanism": "dist+worst_fit refined: triangular peak at mean+item + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 13, "mechanism": "dist+worst_fit refined: worst-fit minus 50 penalty on loosest bin (skip-loosest) + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 14, "mechanism": "dist+worst_fit refined: item-size gate x2 + exact-fit bonus + band bonus [item/2,item]", "family": "dist+worst_fit"}
+{"request_index": 15, "mechanism": "dist+worst_fit refined: triangular peak at leftover=item + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 16, "mechanism": "BF + room-for-another bonus +40 if leftover>item + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 17, "mechanism": "dist+worst_fit refined: mean gate (worst-fit if r>=mean else BF-1000) + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 18, "mechanism": "dist+worst_fit refined: worst-fit minus sliver penalty 30 if 0<leftover<item/4 + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 19, "mechanism": "three-band piecewise: worst-fit if leftover>item else BF + band bonus [item/2,item] + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 20, "mechanism": "dist+worst_fit refined: double gate worst-fit iff spread>=item and n>=3, else BF + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 21, "mechanism": "dist+worst_fit refined: triangular peak at min+item + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 22, "mechanism": "dist+worst_fit refined: spread-weighted blend w=(max-min)/max, score=(1-w)*BF + w*WF + exact-fit bonus", "family": "dist+worst_fit"}
+{"request_index": 23, "mechanism": "dist+worst_fit refined: worst-fit + band bonus 20 if leftover in [item/2,item] + exact-fit bonus; avoids pure dist per memory", "family": "dist+worst_fit"}
+{"request_index": 24, "mechanism": "dist+worst_fit refined: item-size gate x4 + BF branch sliver penalty + exact-fit bonus; avoids pure dist", "family": "dist+worst_fit"}
+{"request_index": 25, "mechanism": "exact-fit bonus only: 10000 if r==item else 0 (ties -> first bin)", "family": "exact-fit bonus only"}
+{"request_index": 26, "mechanism": "dist+worst_fit refined: OR gate worst-fit iff spread>=item or n>=5, else BF + exact-fit bonus; avoids plain and dist", "family": "dist+worst_fit"}
+{"request_index": 27, "mechanism": "triangular peak at leftover=item/3 + exact-fit bonus; avoids plain, dist, count-gate per memory", "family": "triangular peak"}
+{"request_index": 28, "mechanism": "triangular peak at leftover=2*item + exact-fit bonus; avoids plain, dist, count-gate", "family": "triangular peak"}
+{"request_index": 29, "mechanism": "dist+worst_fit refined: spread gate item/2 + BF-branch sliver penalty + exact-fit bonus; avoids plain, dist, count-gate", "family": "dist+worst_fit"}
+{"request_index": 30, "mechanism": "dist+worst_fit refined: ratio gate r>=3*item worst-fit wins, else BF-1000 + exact-fit bonus; avoids plain, dist, count-gate", "family": "dist+worst_fit"}
+{"request_index": 31, "mechanism": "worst_fit refined: skip-loosest penalty 100 (vs 50 in #13) + exact-fit bonus", "family": "worst_fit"}
+{"request_index": 32, "mechanism": "worst_fit refined: spread-weighted blend + band bonus [item/2,item] + exact-fit bonus", "family": "worst_fit"}
