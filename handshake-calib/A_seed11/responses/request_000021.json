@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    lo = min(bins)\n    hi = max(bins)\n    return [-(r - item) - (20 if r > lo + (hi - lo) / 3 else 0) for r in bins]\n```\n", "generator_note": "Range-gated penalty: Best-Fit score minus 20 for bins whose residual is above the lowest third of the residual range."}

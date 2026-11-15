@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-abs((r - item) - item) for r in bins]\n```\n", "generator_note": "Pairing target: leftover after placement close to item size (room for one more same-size item)"}

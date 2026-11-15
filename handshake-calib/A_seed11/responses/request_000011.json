@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    m = sum(bins) / len(bins)\n    return [-(r - item) - abs(r - m) / 4 for r in bins]\n```\n", "generator_note": "Blend: Best-Fit score minus one quarter of the distance from the bin residual to the mean residual."}

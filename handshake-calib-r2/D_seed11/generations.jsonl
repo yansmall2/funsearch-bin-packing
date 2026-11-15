@@ -1,0 +1,32 @@
+{"request_index": 1, "mechanism": "median-rank targeting (-abs(rank-(n-1)/2))", "ts": 1794730991}
+{"request_index": 2, "mechanism": "mode targeting (count(r)*item - leftover)", "ts": 1794731029}
+{"request_index": 3, "mechanism": "double-size pairing target (-abs(leftover-2*item), exact fit tied top)", "ts": 1794731065}
+{"request_index": 4, "mechanism": "preserve min size (target leftover = min(bins), exact fit tied top)", "ts": 1794731102}
+{"request_index": 5, "mechanism": "upper-third targeting (-abs(r-(min+2*(max-min)/3)))", "ts": 1794731145}
+{"request_index": 6, "mechanism": "second-loosest targeting (-abs(r-second_max))", "ts": 1794731186}
+{"request_index": 7, "mechanism": "count-conditional (worst-fit if len(bins)<5 else BF)", "ts": 1794731229}
+{"request_index": 8, "mechanism": "half-usable bonus (bonus item/2 if leftover>=item/2)", "ts": 1794731266}
+{"request_index": 9, "mechanism": "spread-conditional (BF if max-min>item else worst-fit)", "ts": 1794731308}
+{"request_index": 10, "mechanism": "harmonic-mean targeting (-abs(r-harmonic_mean))", "ts": 1794731352}
+{"request_index": 11, "mechanism": "lower-quartile rank targeting (-abs(rank-(n-1)/4))", "ts": 1794731395}
+{"request_index": 12, "mechanism": "upper-quartile rank targeting (-abs(rank-3*(n-1)/4))", "ts": 1794731442}
+{"request_index": 13, "mechanism": "triple-size usability bonus (bonus if leftover>=3*item)", "ts": 1794731485}
+{"request_index": 14, "mechanism": "even-count band bonus (bonus if (leftover//item)%2==0)", "ts": 1794731525}
+{"request_index": 15, "mechanism": "one-more-item band bonus (bonus if item<=leftover<2*item)", "ts": 1794731568}
+{"request_index": 16, "mechanism": "lower-half worst-fit (loosest bin <= midrange)", "ts": 1794731607}
+{"request_index": 17, "mechanism": "four-tier lexicographic (exact > one-more band > roomy > dead)", "ts": 1794731656}
+{"request_index": 18, "mechanism": "half-fill targeting (-abs(item/r-1/2))", "ts": 1794731696}
+{"request_index": 19, "mechanism": "odd-count band bonus (bonus if (leftover//item)%2==1)", "ts": 1794731741}
+{"request_index": 20, "mechanism": "two-thirds fill targeting (-abs(item/r-2/3))", "ts": 1794731782}
+{"request_index": 21, "mechanism": "quarter-fill targeting (-abs(item/r-1/4))", "ts": 1794731826}
+{"request_index": 22, "mechanism": "near-tiling bonus (bonus if (leftover//(item/2))%2==0)", "ts": 1794731880}
+{"request_index": 23, "mechanism": "three-quarters fill targeting (-abs(item/r-3/4))", "ts": 1794731915}
+{"request_index": 24, "mechanism": "three-zone grading (usable bonus, middle-dead penalty)", "ts": 1794731970}
+{"request_index": 25, "mechanism": "sqrt pairing distance (-abs(sqrt(L)-sqrt(item)), exact fit tied top)", "ts": 1794732009}
+{"request_index": 26, "mechanism": "log pairing distance (-abs(log(L+1)-log(item+1)), exact fit tied top)", "ts": 1794732051}
+{"request_index": 27, "mechanism": "graded dead-band (all dead leftovers tie at -item, usable by tightness)", "ts": 1794732122}
+{"request_index": 28, "mechanism": "five-tier lexicographic (one-more +item, two-more +item/2, roomy, dead)", "ts": 1794732170}
+{"request_index": 29, "mechanism": "narrow bands (bonus [item,1.5item), penalty [item/4,3item/4))", "ts": 1794732226}
+{"request_index": 30, "mechanism": "spread-conditional pairing (pairing if max-min > item, else BF)", "ts": 1794732271}
+{"request_index": 31, "mechanism": "count-conditional pairing (pairing if len(bins) < 5, else BF)", "ts": 1794732313}
+{"request_index": 32, "mechanism": "size-conditional pairing (pairing if item*2 >= max(bins), else BF)", "ts": 1794732350}

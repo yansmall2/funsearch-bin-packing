@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) - (60 if (r - item) > 0 and (r - item) < item else 0) for r in bins]\n```\n", "generator_note": "BF minus 60 penalty for awkward gap: leftover in (0, item), too small for another same-size item"}

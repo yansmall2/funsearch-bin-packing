@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (item if ((r - item) // item) % 2 == 0 else 0) for r in bins]\n```\n", "generator_note": "BF + item bonus on even item-width bands of leftover (complement of odd-band parent)"}

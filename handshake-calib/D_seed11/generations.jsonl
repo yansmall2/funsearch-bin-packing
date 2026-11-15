@@ -1,0 +1,19 @@
+{"request_index": 1, "mechanism": "dead-band residual penalty (penalty=item when 0<leftover<item)", "ts": 1794730077}
+{"request_index": 2, "mechanism": "same-size pairing target (-abs(leftover-item), exact fit tied top)", "ts": 1794730159}
+{"request_index": 3, "mechanism": "mean-residual level balancing (-abs(r-mean))", "ts": 1794730196}
+{"request_index": 4, "mechanism": "leftover floor at min residual (bonus if leftover>=min(bins))", "ts": 1794730249}
+{"request_index": 5, "mechanism": "tiling bonus (bonus if leftover % item == 0)", "ts": 1794730284}
+{"request_index": 6, "mechanism": "preserve tightest bin (penalty=item on min(bins) bin)", "ts": 1794730329}
+{"request_index": 7, "mechanism": "size-conditional worst-fit for big items (item*2>=max(bins)) else BF", "ts": 1794730377}
+{"request_index": 8, "mechanism": "three-tier lexicographic (exact > usable BF > dead)", "ts": 1794730427}
+{"request_index": 9, "mechanism": "residual diversity (novel-leftover bonus, unique-residual penalty)", "ts": 1794730485}
+{"request_index": 10, "mechanism": "double-size usability bonus (bonus if leftover>=2*item)", "ts": 1794730528}
+{"request_index": 11, "mechanism": "midrange targeting (-abs(r-(min+max)/2))", "ts": 1794730563}
+{"request_index": 12, "mechanism": "tiny-item worst-fit (item*4<=min(bins) -> loosest) else BF", "ts": 1794730601}
+{"request_index": 13, "mechanism": "geometric-mean targeting (-abs(r-geomean))", "ts": 1794730643}
+{"request_index": 14, "mechanism": "tight-half worst-fit (loosest bin <= mean residual)", "ts": 1794730693}
+{"request_index": 15, "mechanism": "barely-double penalty (penalty if 2*item<=r<3*item)", "ts": 1794730748}
+{"request_index": 16, "mechanism": "second-tightest targeting (-abs(r-second_min))", "ts": 1794730791}
+{"request_index": 17, "mechanism": "near-twin bonus (bonus if another residual within item/4)", "ts": 1794730829}
+{"request_index": 18, "mechanism": "leave-one-out mean targeting (-abs(r-mean_others))", "ts": 1794730872}
+{"request_index": 19, "mechanism": "lower-third targeting (-abs(r-(min+(max-min)/3)))", "ts": 1794730938}

@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [(-(r - item) if len(bins) <= 3 else (-abs((r - item) - sum(bins) / len(bins) / 4) if len(bins) <= 8 else r)) for r in bins]\n```\n", "generator_note": "Three-level count switch: <=3 bins BF, 4-8 bins mean-target, >8 bins Worst Fit"}

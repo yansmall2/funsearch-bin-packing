@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-abs((r - item) - 25) for r in bins]\n```\n", "generator_note": "Fixed target leftover 25: prefer bins whose leftover after placement is closest to 25."}

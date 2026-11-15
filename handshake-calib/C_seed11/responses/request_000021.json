@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (30 if (r - item) > 0 and (r - item) <= 4 else 0) for r in bins]\n```\n", "generator_note": "BF + 30 bonus for near-fit leftover 1-4 (near-fit ranks above exact fit)"}

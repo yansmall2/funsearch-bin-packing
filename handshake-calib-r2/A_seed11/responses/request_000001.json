@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (25 if item <= (r - item) <= item + 10 else 0) for r in bins]\n```\n", "generator_note": "One-more-item band bonus: Best-Fit score plus 25 when leftover after placement is in [item, item+10], so the bin could still fit another similar item."}

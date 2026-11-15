@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [((r - item) if item >= 70 else -(r - item)) for r in bins]\n```\n", "generator_note": "Flipped item switch: Worst Fit for large items (>=70), Best Fit for smaller items."}

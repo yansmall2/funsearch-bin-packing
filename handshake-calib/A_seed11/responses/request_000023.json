@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (30 if (r - item) <= 4 else 0) - (20 if 5 <= (r - item) <= 9 else 0) for r in bins]\n```\n", "generator_note": "Combined rule, mid bands: +30 if leftover<=4, -20 if leftover 5..9, on Best-Fit score."}

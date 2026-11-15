@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) - (40 if (r - item) > 60 else 0) for r in bins]\n```\n", "generator_note": "BF minus 40 penalty for leftover > 60 (avoid leaving very roomy bins barely used)"}

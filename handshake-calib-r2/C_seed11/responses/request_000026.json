@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (30 if ((r - item) // 25) % 2 == 0 else 0) for r in bins]\n```\n", "generator_note": "BF + 30 bonus on even twenty-five-bands of leftover (0-24, 50-74)"}

@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (40 if (r - item) >= 20 and (r - item) <= 40 else 0) - (60 if (r - item) > 0 and (r - item) < 10 else 0) for r in bins]\n```\n", "generator_note": "Dual-band: +40 for leftover 20-40, -60 for tiny leftover 1-9, else BF"}

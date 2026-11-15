@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-abs((r - item) - 100 / (len(bins) + 1)) for r in bins]\n```\n", "generator_note": "Count-dependent target: leftover close to 100/(num_bins+1); tighter when many bins open"}

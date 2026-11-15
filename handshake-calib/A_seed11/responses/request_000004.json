@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    m = sum(bins) / len(bins)\n    return [-abs(r - m) for r in bins]\n```\n", "generator_note": "Mean-target: score is negative distance of a bin residual from the mean residual of all feasible bins."}

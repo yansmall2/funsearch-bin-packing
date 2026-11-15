@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    t = (min(bins) + max(bins)) / 2\n    return [-abs(r - t) for r in bins]\n```\n", "generator_note": "Midrange target: prefer bins whose residual is closest to (min+max)/2 of feasible residuals."}

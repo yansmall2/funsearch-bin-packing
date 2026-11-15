@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [(-(r - item) if item >= 67 else (-abs((r - item) - item) if item >= 34 else r)) for r in bins]\n```\n", "generator_note": "Three-tier size rule: large>=67 BF, medium 34-66 pairing target, small<34 Worst Fit"}

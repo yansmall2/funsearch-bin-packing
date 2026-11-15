@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-abs((r - item) - min(bins) / 2) for r in bins]\n```\n", "generator_note": "Peaked target: leftover close to min feasible residual / 2"}

@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [((-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0)) if len(bins) >= 5 else -(r - item)) for r in bins]\n```\n", "generator_note": "Count-gated stripes: even ten-band bonus only when >=5 bins open, else pure BF"}

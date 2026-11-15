@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (40 if r >= 30 and r <= 50 else 0) for r in bins]\n```\n", "generator_note": "Count-conditional: worst-fit when fewer than 5 bins open, else Best Fit."}

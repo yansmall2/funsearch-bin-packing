@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if 35 <= (r - item) <= 50 else 0) - (15 if 10 <= (r - item) <= 20 else 0) for r in bins]\n```\n", "generator_note": "Sweet band shifted up plus mid penalty: +20 if leftover in [35, 50], -15 if leftover in [10, 20], on Best-Fit score."}

@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [(0 if (r - item) == 0 else (-(r - item) if (r - item) >= item else -(r - item) - 50)) for r in bins]\n```\n", "generator_note": "Soft version of the leave-less-than-item penalty: exact fit scores 0, leftover>=item scores Best-Fit, smaller positive leftover loses an extra 50."}

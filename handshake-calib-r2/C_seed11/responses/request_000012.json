@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [((-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0)) if item < 40 else -(r - item)) for r in bins]\n```\n", "generator_note": "Size-gated stripes: even ten-band bonus only for small items (<40), else pure BF"}

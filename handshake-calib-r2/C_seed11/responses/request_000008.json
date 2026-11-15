@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (40 if r >= 30 and r <= 50 else 0) for r in bins]\n```\n", "generator_note": "BF + 40 bonus for bins with current residual 30-50"}

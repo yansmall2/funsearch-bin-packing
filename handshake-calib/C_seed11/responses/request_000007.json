@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-abs(r - 60) for r in bins]\n```\n", "generator_note": "Mid-residual preference: favor bins with residual near 60 (neither tightest nor emptiest)"}

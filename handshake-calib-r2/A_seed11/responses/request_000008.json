@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if (r - item) <= 2 else 0) - (12 if 3 <= (r - item) <= 6 else 0) for r in bins]\n```\n", "generator_note": "Combined rule, narrow bands: +20 if leftover<=2, -12 if leftover 3..6, on Best-Fit score."}

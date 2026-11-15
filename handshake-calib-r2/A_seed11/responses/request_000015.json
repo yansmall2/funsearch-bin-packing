@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if 30 <= (r - item) <= 45 and len(bins) >= 4 else 0) for r in bins]\n```\n", "generator_note": "Sweet band bonus gated by bin count: +20 if leftover in [30, 45] and at least 4 feasible bins, otherwise plain Best Fit."}

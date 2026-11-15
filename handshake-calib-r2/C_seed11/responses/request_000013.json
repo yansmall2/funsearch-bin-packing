@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-min(abs((r - item) - 10), abs((r - item) - 40)) for r in bins]\n```\n", "generator_note": "Bimodal target: leftover close to 10 or to 40 (nearest of two peaks)"}

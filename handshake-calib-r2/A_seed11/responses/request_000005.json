@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-abs(r - 3 * item / 2) for r in bins]\n```\n", "generator_note": "Half-item target leftover: prefer bins whose residual is closest to 1.5x the item size, so leftover is about half an item."}

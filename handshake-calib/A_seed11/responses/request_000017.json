@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (30 if (r - item) >= 40 else 0) for r in bins]\n```\n", "generator_note": "Large-leftover bonus: Best-Fit score plus 30 when leftover after placement is at least 40."}

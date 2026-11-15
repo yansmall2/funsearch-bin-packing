@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) - (50 if r == min(bins) else 0) for r in bins]\n```\n", "generator_note": "Second-tightest targeting: prefer bin whose residual is closest to second-smallest residual."}

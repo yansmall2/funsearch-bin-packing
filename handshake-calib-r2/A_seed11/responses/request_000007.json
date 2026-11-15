@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) - (25 if 20 <= (r - item) <= 35 else 0) for r in bins]\n```\n", "generator_note": "Mid-range penalty: Best-Fit score minus 25 when leftover after placement is in [20, 35]."}

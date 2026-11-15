@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) - (30 if r >= max(bins) - (max(bins) - min(bins)) / 4 else 0) for r in bins]\n```\n", "generator_note": "BF minus 30 penalty for bins in the highest quartile of the current residual range"}

@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) + (15 if (r - item) % 5 == 0 else 0) for r in bins]\n```\n", "generator_note": "BF + 15 bonus when leftover is a multiple of 5 (round-leftover, modulus 5)"}

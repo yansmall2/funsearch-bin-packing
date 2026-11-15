@@ -1,0 +1,32 @@
+{"request_index": 1, "mechanism": "BF -60 penalty leftover in (0,item)", "ts": 1794730996}
+{"request_index": 2, "mechanism": "BF +30 bonus r <= midrange", "ts": 1794731031}
+{"request_index": 3, "mechanism": "4-tier size BF/pairing/WF/mid50", "ts": 1794731062}
+{"request_index": 4, "mechanism": "BF +30 bonus even ten-band leftover", "ts": 1794731099}
+{"request_index": 5, "mechanism": "3-level count switch BF/mean/WF", "ts": 1794731131}
+{"request_index": 6, "mechanism": "BF -40 penalty leftover>60", "ts": 1794731166}
+{"request_index": 7, "mechanism": "peaked target residual=33", "ts": 1794731195}
+{"request_index": 8, "mechanism": "BF +40 bonus residual r in [30,50]", "ts": 1794731228}
+{"request_index": 9, "mechanism": "BF +30 bonus odd ten-band leftover", "ts": 1794731259}
+{"request_index": 10, "mechanism": "BF +20 bonus even five-band leftover", "ts": 1794731290}
+{"request_index": 11, "mechanism": "BF +50 bonus even ten-band leftover", "ts": 1794731321}
+{"request_index": 12, "mechanism": "stripe bonus gated item<40", "ts": 1794731351}
+{"request_index": 13, "mechanism": "bimodal target 10 or 40", "ts": 1794731382}
+{"request_index": 14, "mechanism": "bimodal target 20 or 50", "ts": 1794731413}
+{"request_index": 15, "mechanism": "BF +30 bonus even twenty-band leftover", "ts": 1794731446}
+{"request_index": 16, "mechanism": "BF +25 bonus r >= mean(bins)", "ts": 1794731481}
+{"request_index": 17, "mechanism": "BF +25 bonus r < mean(bins)", "ts": 1794731512}
+{"request_index": 18, "mechanism": "BF +30 bonus even ten-band of r", "ts": 1794731542}
+{"request_index": 19, "mechanism": "BF +30 bonus even fifteen-band leftover", "ts": 1794731576}
+{"request_index": 20, "mechanism": "trimodal target 10/30/50", "ts": 1794731607}
+{"request_index": 21, "mechanism": "BF +30 bonus lowest quartile of range", "ts": 1794731644}
+{"request_index": 22, "mechanism": "BF -30 penalty highest quartile of range", "ts": 1794731675}
+{"request_index": 23, "mechanism": "stripe bonus gated len>=5", "ts": 1794731705}
+{"request_index": 24, "mechanism": "bimodal target on r: 40 or 80", "ts": 1794731737}
+{"request_index": 25, "mechanism": "BF +20 bonus odd five-band leftover", "ts": 1794731767}
+{"request_index": 26, "mechanism": "BF +30 bonus even 25-band leftover", "ts": 1794731796}
+{"request_index": 27, "mechanism": "BF +item bonus even item-width bands", "ts": 1794731829}
+{"request_index": 28, "mechanism": "BF +30 bonus odd twenty-band leftover", "ts": 1794731860}
+{"request_index": 29, "mechanism": "stripe bonus gated len>=8", "ts": 1794731899}
+{"request_index": 30, "mechanism": "BF +item/2 bonus odd item-width bands", "ts": 1794731930}
+{"request_index": 31, "mechanism": "BF +item/2 bonus even item-width bands", "ts": 1794731961}
+{"request_index": 32, "mechanism": "double-gated stripe len>=5 and item<40", "ts": 1794731992}

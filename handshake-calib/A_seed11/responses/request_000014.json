@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-(r - item) - (30 if 1 <= (r - item) <= 12 else 0) for r in bins]\n```\n", "generator_note": "Strong sliver avoidance: Best-Fit score minus 30 when leftover after placement is 1..12."}

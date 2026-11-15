@@ -1,0 +1,215 @@
+{
+  "selection_rule": "search top5; validation mean; search mean; code length; hash",
+  "validation_hash": "394b41525697c8601d3b24ceb07fb6d495f0942865ee1097ce869fc56e15bc9e",
+  "candidates": [
+    {
+      "id": "candidate_000004",
+      "code": "def priority(item, bins):\n    return [-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0) for r in bins]\n",
+      "code_hash": "6368c8cb68469349f4161c25336cc6e209767ea99918c27ffae072de3d19caa4",
+      "search_mean_bins": 265.2,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          257
+        ],
+        "mean_bins": 267.6,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "fd62be6870c862ba51e449a626554082afb5366e8a88dc9a6468ce025103bc4a",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "8cbe104b56132fac0df762156193ef8856fdcd7ff39ead9a19c2040cf6f7deb0",
+          "d4dbc61f4b40f5979d4e20d674a11c77bda07ac35405d9375ed4888a40112c67",
+          "c0a1c81e3bf0e82283bed1ba013c066a9a51bc34e31b380d192ac3975412c73b",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "afad4e9f72651040bf94141e78a1088061ef6f449e478d70826132748c182274",
+          "090c5b052b1807e47fa520f8092c3d56016291d5833f896c09bdad13ac3ec3dd"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000030",
+      "code": "def priority(item, bins):\n    return [-(r - item) + (item / 2 if ((r - item) // item) % 2 == 1 else 0) for r in bins]\n",
+      "code_hash": "2dddb34b8dc3ed22ee149e519d840837851783473ddc6fe3a9472b66b5047783",
+      "search_mean_bins": 265.2,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "0e1c7087da4e6a32ce3950f773e48ae50ae0e99251e46063191b1b27e8d9e616",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "9dffba9abe6e09ba9cd62aaec11c0fd8518a423f0389ae4b040deff6117d2bef",
+          "65943a2e3e26eba2026a6ff302b9dd36033a17a3056769a00c01c21a5ed6ac01",
+          "3259a6f96dc5b8aa1c63dab87f38f6a681234823e002bf20df736cf61db9a266",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "010c55d33805aa288bb98c5b0363ed90b4155578aed73a1792eea2879b207f62",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000023",
+      "code": "def priority(item, bins):\n    return [((-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0)) if len(bins) >= 5 else -(r - item)) for r in bins]\n",
+      "code_hash": "63b5fc0b12fa0365f947c473ff9bd1d5e5282b81589e3af5648659f768630b3c",
+      "search_mean_bins": 265.23333333333335,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "a65ea9a43ce888cd0f73627449b14d58b862116ff5c63a2eae05f1f5924e74ab",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "8cbe104b56132fac0df762156193ef8856fdcd7ff39ead9a19c2040cf6f7deb0",
+          "7cac1ee199b9677b1dac12c808366e96aa1dbcdc84ad2b64dd63c1218b754f17",
+          "c0a1c81e3bf0e82283bed1ba013c066a9a51bc34e31b380d192ac3975412c73b",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "acf9d2ba5903a2510a0ab53cd4b1c0fca7f0e4113e22a70c5ff05b0cd3aad393",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000029",
+      "code": "def priority(item, bins):\n    return [((-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0)) if len(bins) >= 8 else -(r - item)) for r in bins]\n",
+      "code_hash": "cfa80f481b7ae908249afea9f12e67a6df031033dbcf911bbf880651b03d6099",
+      "search_mean_bins": 265.23333333333335,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "ceb54f9e07072d4b2b2173f696e4f0a4927cc7a7f7bc8dbfb51e1815aca5ab69",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "6607b079a71b4c9140436b9e7f45fbc6a478d17cae7f7c87dae175c30851bf95",
+          "65943a2e3e26eba2026a6ff302b9dd36033a17a3056769a00c01c21a5ed6ac01",
+          "0832964116df66309fcdec19fb5d4a1a594ccec8973143c0666187997e21ce20",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "010c55d33805aa288bb98c5b0363ed90b4155578aed73a1792eea2879b207f62",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000032",
+      "code": "def priority(item, bins):\n    return [((-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0)) if len(bins) >= 5 and item < 40 else -(r - item)) for r in bins]\n",
+      "code_hash": "270473b2103384e5d8b6a883d620047f46c9034206bbfe8b0cf72bc4d5e6fc7c",
+      "search_mean_bins": 265.23333333333335,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "a65ea9a43ce888cd0f73627449b14d58b862116ff5c63a2eae05f1f5924e74ab",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "8cbe104b56132fac0df762156193ef8856fdcd7ff39ead9a19c2040cf6f7deb0",
+          "7cac1ee199b9677b1dac12c808366e96aa1dbcdc84ad2b64dd63c1218b754f17",
+          "c0a1c81e3bf0e82283bed1ba013c066a9a51bc34e31b380d192ac3975412c73b",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "acf9d2ba5903a2510a0ab53cd4b1c0fca7f0e4113e22a70c5ff05b0cd3aad393",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    }
+  ],
+  "selected": {
+    "id": "candidate_000004",
+    "code": "def priority(item, bins):\n    return [-(r - item) + (30 if ((r - item) // 10) % 2 == 0 else 0) for r in bins]\n",
+    "code_hash": "6368c8cb68469349f4161c25336cc6e209767ea99918c27ffae072de3d19caa4",
+    "search_mean_bins": 265.2,
+    "validation": {
+      "counts": [
+        275,
+        286,
+        265,
+        265,
+        272,
+        263,
+        264,
+        265,
+        264,
+        257
+      ],
+      "mean_bins": 267.6,
+      "trace_hashes": [
+        "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+        "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+        "fd62be6870c862ba51e449a626554082afb5366e8a88dc9a6468ce025103bc4a",
+        "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+        "8cbe104b56132fac0df762156193ef8856fdcd7ff39ead9a19c2040cf6f7deb0",
+        "d4dbc61f4b40f5979d4e20d674a11c77bda07ac35405d9375ed4888a40112c67",
+        "c0a1c81e3bf0e82283bed1ba013c066a9a51bc34e31b380d192ac3975412c73b",
+        "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+        "afad4e9f72651040bf94141e78a1088061ef6f449e478d70826132748c182274",
+        "090c5b052b1807e47fa520f8092c3d56016291d5833f896c09bdad13ac3ec3dd"
+      ]
+    },
+    "status": "valid"
+  },
+  "used_seed_fallback": false,
+  "heldout_evaluated": false,
+  "evidence_scope": "llm_pilot_unless_frozen",
+  "timeout_seconds": 30,
+  "seconds": 1.7134152000000995
+}

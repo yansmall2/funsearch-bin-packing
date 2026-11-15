@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [(-(r - item) if item >= 51 else (-abs((r - item) - item) if item >= 34 else (r if item >= 21 else -abs(r - 50)))) for r in bins]\n```\n", "generator_note": "Four-tier size classes: >50 BF, 34-50 pairing, 21-33 Worst Fit, <=20 mid-residual 50"}

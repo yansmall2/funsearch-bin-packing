@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-min(abs((r - item) - 10), abs((r - item) - 30), abs((r - item) - 50)) for r in bins]\n```\n", "generator_note": "Trimodal target: leftover close to 10, 30 or 50 (nearest of three peaks)"}

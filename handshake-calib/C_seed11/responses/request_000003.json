@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [(-(r - item) if item >= 50 else r) for r in bins]\n```\n", "generator_note": "Size-tiered: large items (>=50) Best Fit, small items Worst Fit (preserve tight bins)"}

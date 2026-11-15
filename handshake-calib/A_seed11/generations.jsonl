@@ -1,0 +1,26 @@
+{"request_index": 1, "mechanism": "near-full band bonus (leftover<=3, +25 on BF score)", "ts": 1794730062}
+{"request_index": 2, "mechanism": "sliver avoidance penalty (leftover 1..7, -15 on BF score)", "ts": 1794730095}
+{"request_index": 3, "mechanism": "item-size tiered BF/WF switch (threshold 50)", "ts": 1794730128}
+{"request_index": 4, "mechanism": "mean-residual target (-abs(r - mean(bins)))", "ts": 1794730159}
+{"request_index": 5, "mechanism": "fill-or-preserve hybrid (leftover<=10: 100-leftover; else leftover)", "ts": 1794730193}
+{"request_index": 6, "mechanism": "bin-count BF/WF switch (len(bins)>=5 -> BF)", "ts": 1794730223}
+{"request_index": 7, "mechanism": "item-sized target leftover (-abs(r - 2*item))", "ts": 1794730257}
+{"request_index": 8, "mechanism": "midrange target (-abs(r - (min+max)/2))", "ts": 1794730288}
+{"request_index": 9, "mechanism": "round-leftover bonus (leftover%10==0, +12 on BF)", "ts": 1794730320}
+{"request_index": 10, "mechanism": "fixed target leftover 25 (-abs(leftover-25))", "ts": 1794730355}
+{"request_index": 11, "mechanism": "BF blended with mean-distance penalty (/4)", "ts": 1794730390}
+{"request_index": 12, "mechanism": "mid-band penalty (leftover 8..20, -18 on BF)", "ts": 1794730422}
+{"request_index": 13, "mechanism": "exact-fit-first else worst-fit (leftover==0 -> 1000)", "ts": 1794730453}
+{"request_index": 14, "mechanism": "sliver avoidance, wide band (leftover 1..12, -30 on BF)", "ts": 1794730488}
+{"request_index": 15, "mechanism": "item-size tiered BF/WF switch (threshold 20)", "ts": 1794730524}
+{"request_index": 16, "mechanism": "above-mean residual penalty (r>mean -> -10 on BF)", "ts": 1794730556}
+{"request_index": 17, "mechanism": "large-leftover bonus (leftover>=40, +30 on BF)", "ts": 1794730588}
+{"request_index": 18, "mechanism": "combined near-full bonus + sliver penalty (<=3:+25, 4..7:-15)", "ts": 1794730620}
+{"request_index": 19, "mechanism": "soft leave-less-than-item penalty (fixed -50)", "ts": 1794730655}
+{"request_index": 20, "mechanism": "combined bonus+penalty, wide bands (<=5:+40, 6..10:-25)", "ts": 1794730686}
+{"request_index": 21, "mechanism": "range-gated penalty (r above lowest third of range -> -20 on BF)", "ts": 1794730724}
+{"request_index": 22, "mechanism": "three-tier item switch (WF<=25, BF 26..60, WF>60)", "ts": 1794730757}
+{"request_index": 23, "mechanism": "combined bonus+penalty, mid bands (<=4:+30, 5..9:-20)", "ts": 1794730792}
+{"request_index": 24, "mechanism": "combined rule gated by item size (WF if item<=15)", "ts": 1794730824}
+{"request_index": 25, "mechanism": "item-relative bands (<=item/10:+25, (item/10,item/2]:-15)", "ts": 1794730856}
+{"request_index": 26, "mechanism": "tight-fit-exists switch (min leftover<=6 -> BF else WF)", "ts": 1794730903}
