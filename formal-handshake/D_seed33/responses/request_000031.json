@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward bins whose residual capacity already appears at least twice among open bins, encouraging uniform residual sizes that can host similar future items, while keeping Best Fit ordering everywhere else.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (25 if sum([1 for x in bins if x == r]) >= 2 else 0) for r in bins]\n```"}

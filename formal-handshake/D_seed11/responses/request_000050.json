@@ -1,0 +1,1 @@
+{"text": "Strategy: Penalize placements leaving 65 to 80 units free, discouraging mid-roomy bins, with Best Fit ordering elsewhere.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) - (20 if 65 <= r - item <= 80 else 0) for r in bins]\n```"}

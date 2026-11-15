@@ -1,0 +1,1 @@
+{"text": "Strategy: Use the triangular bonus peaking at leftover 35 over [25,45], which performed well in another seed, to test whether it transfers across seeds.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (30 - abs((r - item) - 35) if 25 <= r - item <= 45 else 0) for r in bins]\n```"}

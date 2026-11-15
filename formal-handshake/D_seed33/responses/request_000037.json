@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward placements landing within 5 of either leftover 35 or leftover 60, keeping two attractive residual sizes instead of one.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (25 if abs((r - item) - 35) <= 5 or abs((r - item) - 60) <= 5 else 0) for r in bins]\n```"}

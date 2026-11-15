@@ -1,0 +1,1 @@
+{"text": "Strategy: Apply the [30,45] sweet-band bonus only when at most 3 bins are open, using pure Best Fit once many bins exist.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if len(bins) <= 3 and 30 <= r - item <= 45 else 0) for r in bins]\n```"}

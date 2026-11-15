@@ -1,0 +1,1 @@
+{"text": "Strategy: For large items of 70 or more, take the loosest bin outright; for smaller items use the [28,42] sweet band over Best Fit.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (1000 if item >= 70 and r == max(bins) else 0) + (20 if item < 70 and 28 <= r - item <= 42 else 0) for r in bins]\n```"}

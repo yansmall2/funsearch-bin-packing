@@ -1,0 +1,1 @@
+{"text": "Strategy: Use a gentler quarter-item scaling for both the [28,42] bonus and the [6,20] penalty.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (item / 4 if 28 <= r - item <= 42 else 0) - (item / 4 if 6 <= r - item <= 20 else 0) for r in bins]\n```"}

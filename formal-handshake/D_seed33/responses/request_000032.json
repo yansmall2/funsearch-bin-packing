@@ -1,0 +1,1 @@
+{"text": "Strategy: Aim for a post-placement leftover of 60, keeping a large usable residual instead of packing tightly, testing whether preserving roomier bins beats the usual sweet bands.\n\n```python\ndef priority(item, bins):\n    return [-abs((r - item) - 60) for r in bins]\n```"}

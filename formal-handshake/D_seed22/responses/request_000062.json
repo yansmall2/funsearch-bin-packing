@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward the wide [25,50] band with a quarter of the item size, testing the gentler item-scaled bonus in this seed.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (item / 4 if 25 <= r - item <= 50 else 0) for r in bins]\n```"}

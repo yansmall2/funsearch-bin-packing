@@ -1,0 +1,1 @@
+{"text": "Strategy: Combine an exact-fit bonus of +100 with the [28,42] sweet band and a mild sliver penalty.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (100 if r - item == 0 else 0) + (20 if 28 <= r - item <= 42 else 0) - (15 if 6 <= r - item <= 20 else 0) for r in bins]\n```"}

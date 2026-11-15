@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward the [30,45] band with half the item size and no penalty, a gentler item-scaled variant.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (item / 2 if 30 <= r - item <= 45 else 0) for r in bins]\n```"}

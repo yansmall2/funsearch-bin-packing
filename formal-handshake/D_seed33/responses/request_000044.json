@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward leftovers in a band shifted by the item size itself, [item+28, item+42], so the target residual grows with the item instead of staying absolute.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if item + 28 <= r - item <= item + 42 else 0) for r in bins]\n```"}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward two separate leftover windows, [25,45] and [60,75], with +15 each, keeping two attractive residual sizes.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (15 if 25 <= r - item <= 45 else 0) + (15 if 60 <= r - item <= 75 else 0) for r in bins]\n```"}

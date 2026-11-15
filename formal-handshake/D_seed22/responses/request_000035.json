@@ -1,0 +1,1 @@
+{"text": "Strategy: Apply the wide [25,50] sweet-band bonus only when the number of open bins is odd, keeping pure Best Fit on even counts, to test whether bin-count parity carries any signal.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if len(bins) % 2 == 1 and 25 <= r - item <= 50 else 0) for r in bins]\n```"}

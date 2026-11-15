@@ -1,0 +1,1 @@
+{"text": "Strategy: Target a residual 15 below the loosest bin, choosing a roomy bin without taking the loosest one, to keep the loosest bin available.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - (max(bins) - 15)) for r in bins]\n```"}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Use a triangular bonus peaking at leftover 45 over [35,55], shifting the peak higher than the earlier triangular tests.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (30 - abs((r - item) - 45) if 35 <= r - item <= 55 else 0) for r in bins]\n```"}

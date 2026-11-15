@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward bins within one standard deviation of the mean residual, a wider typical-bin preference than the half-deviation test.\n\n```python\ndef priority(item, bins):\n    m = sum(bins) / len(bins)\n    v = sum([(x - m) ** 2 for x in bins]) / len(bins)\n    s = sqrt(v)\n    return [-(r - item) + (20 if abs(r - m) <= s else 0) for r in bins]\n```"}

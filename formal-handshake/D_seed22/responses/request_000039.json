@@ -1,0 +1,1 @@
+{"text": "Strategy: Target a residual 20 percent above the mean residual, aiming slightly looser than average to preserve usable space.\n\n```python\ndef priority(item, bins):\n    m = sum(bins) / len(bins)\n    return [-abs(r - m * 1.2) for r in bins]\n```"}

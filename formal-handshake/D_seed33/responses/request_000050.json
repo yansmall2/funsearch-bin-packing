@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward leftovers in [item+5, item+20], just above one item size, keeping room for one more similar item.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (25 if item + 5 <= r - item <= item + 20 else 0) for r in bins]\n```"}

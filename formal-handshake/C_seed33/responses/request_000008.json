@@ -1,0 +1,1 @@
+{"text": "```python\ndef priority(item, bins):\n    return [-min(abs(r - item - 15), abs(r - item - 65)) for r in bins]\n```\n"}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Aim for a post-placement leftover of exactly thirty-five, between the thirty and forty targets tried before. It may help if thirty-five is the sweet spot, but may fail if no single fixed target fits all item sizes.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - item - 35) for r in bins]\n```\n"}

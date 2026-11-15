@@ -1,0 +1,1 @@
+{"text": "Strategy: Combine a stronger +25 bonus on the wide [25,50] band with a penalty on the [55,75] roomy band.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (25 if 25 <= r - item <= 50 else 0) - (15 if 55 <= r - item <= 75 else 0) for r in bins]\n```"}

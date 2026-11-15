@@ -1,0 +1,1 @@
+{"text": "Strategy: Pay +100 for an exact fit and +20 for the [28,42] sweet band, combining the strongest possible close with the best band found so far.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (100 if r - item == 0 else 0) + (20 if 28 <= r - item <= 42 else 0) for r in bins]\n```"}

@@ -1,0 +1,100 @@
+{"request_index": 1, "mechanism": "spread-gated worst-fit (loosest wins if max-min > item, else BF)", "ts": 1794734264}
+{"request_index": 2, "mechanism": "twin-the-tightest (bonus if post-placement residual within 5 of min residual)", "ts": 1794734328}
+{"request_index": 3, "mechanism": "target leftover = item/3 (-abs(leftover - item/3))", "ts": 1794734383}
+{"request_index": 4, "mechanism": "twin windows bonus (leftover in [0,5] or [item-5,item] gets +20)", "ts": 1794734430}
+{"request_index": 5, "mechanism": "capped tightness (score -min(leftover, 40), loose bins tie)", "ts": 1794734481}
+{"request_index": 6, "mechanism": "loosest-quartile bonus (r in top quarter of [min,max] gets +30)", "ts": 1794734523}
+{"request_index": 7, "mechanism": "target leftover = min(bins) (-abs(leftover - min))", "ts": 1794734563}
+{"request_index": 8, "mechanism": "interior bonus (non-extreme bins get +25 over BF)", "ts": 1794734604}
+{"request_index": 9, "mechanism": "relative loose bonus (leftover >= max/2 gets +25)", "ts": 1794734653}
+{"request_index": 10, "mechanism": "wide absolute band [25,50] +20, no penalty", "ts": 1794734692}
+{"request_index": 11, "mechanism": "loosest bin with r <= 2*item, else BF fallback", "ts": 1794734729}
+{"request_index": 12, "mechanism": "wide absolute band [20,55] +20, no penalty", "ts": 1794734763}
+{"request_index": 13, "mechanism": "wide band [25,50] +20 plus penalty [55,75] -15", "ts": 1794734803}
+{"request_index": 14, "mechanism": "low band bonus [10,20] +20", "ts": 1794734842}
+{"request_index": 15, "mechanism": "wide band [25,50] +20 plus sliver penalty <10 -25", "ts": 1794734876}
+{"request_index": 16, "mechanism": "target leftover = 45 (-abs(leftover - 45))", "ts": 1794734911}
+{"request_index": 17, "mechanism": "target leftover = 50 (-abs(leftover - 50))", "ts": 1794734945}
+{"request_index": 18, "mechanism": "wide band [25,50] +30, no penalty (stronger bonus)", "ts": 1794734979}
+{"request_index": 19, "mechanism": "wide band [25,50] +20 plus penalty [10,24] -25", "ts": 1794735012}
+{"request_index": 20, "mechanism": "target leftover = item+10 (-abs(leftover - item - 10))", "ts": 1794735046}
+{"request_index": 21, "mechanism": "round-leftover bonus (leftover % 10 == 0 gets +20)", "ts": 1794735083}
+{"request_index": 22, "mechanism": "item-gated winning band ([28,42] +20 only if 30<=item<=70)", "ts": 1794735123}
+{"request_index": 23, "mechanism": "wide band [25,50] +20 plus penalty [51,60] -25", "ts": 1794735160}
+{"request_index": 24, "mechanism": "target leftover = 55 (-abs(leftover - 55))", "ts": 1794735194}
+{"request_index": 25, "mechanism": "pure bonus band [28,42] +20, no penalty (cross-seed test)", "ts": 1794735235}
+{"request_index": 26, "mechanism": "pure bonus band [28,42] +15, no penalty", "ts": 1794735273}
+{"request_index": 27, "mechanism": "item-scaled band (reward/penalty=item/2) cross-seed test", "ts": 1794735311}
+{"request_index": 28, "mechanism": "item-scaled wide band [25,50] reward=item/2, no penalty (cross-seed)", "ts": 1794735343}
+{"request_index": 29, "mechanism": "item-scaled wide band [25,50] reward=item, no penalty", "ts": 1794735377}
+{"request_index": 30, "mechanism": "spread-gated band ([28,42] +20 only if max-min>30)", "ts": 1794735413}
+{"request_index": 31, "mechanism": "normalized-position band [0.3,0.5] of residual spread +20 over BF", "ts": 1794735612}
+{"request_index": 32, "mechanism": "second-tightest bin bonus +30 over BF", "ts": 1794735650}
+{"request_index": 33, "mechanism": "near-exact bonus +30 for leftover in [1,5] over BF", "ts": 1794735686}
+{"request_index": 34, "mechanism": "asymmetric-V target on leftover 40 (steeper above)", "ts": 1794735725}
+{"request_index": 35, "mechanism": "bin-count parity gate (wide band only on odd bin counts)", "ts": 1794735758}
+{"request_index": 36, "mechanism": "target leftover 65 (-abs(L-65))", "ts": 1794735790}
+{"request_index": 37, "mechanism": "fill-fraction target 3/5 (-abs(item/r - 3/5))", "ts": 1794735822}
+{"request_index": 38, "mechanism": "leftover divisible by 3 bonus +20 over BF", "ts": 1794735855}
+{"request_index": 39, "mechanism": "target residual 1.2x mean (-abs(r - 1.2*mean))", "ts": 1794735893}
+{"request_index": 40, "mechanism": "target leftover 70 (-abs(L-70))", "ts": 1794735926}
+{"request_index": 41, "mechanism": "pure bonus band [15,25] +20 over BF", "ts": 1794735958}
+{"request_index": 42, "mechanism": "target leftover 2.5*item (-abs(L-2.5*item))", "ts": 1794735991}
+{"request_index": 43, "mechanism": "leftover divisible by 7 bonus +20 over BF", "ts": 1794736029}
+{"request_index": 44, "mechanism": "pure bonus band [75,90] +20 over BF", "ts": 1794736063}
+{"request_index": 45, "mechanism": "too-roomy penalty -25 for leftover > 3*item over BF", "ts": 1794736095}
+{"request_index": 46, "mechanism": "band [28,42]+20 plus penalty [60,90]-20 over BF", "ts": 1794736127}
+{"request_index": 47, "mechanism": "leftover divisible by 4 bonus +20 over BF", "ts": 1794736161}
+{"request_index": 48, "mechanism": "large-item worst-fit (item>=70 loosest) else [28,42] band", "ts": 1794736196}
+{"request_index": 49, "mechanism": "fill-fraction target 1/5 (-abs(item/r - 1/5))", "ts": 1794736229}
+{"request_index": 50, "mechanism": "target leftover 80 (-abs(L-80))", "ts": 1794736260}
+{"request_index": 51, "mechanism": "target residual min+10 (-abs(r-(min+10)))", "ts": 1794736304}
+{"request_index": 52, "mechanism": "pure bonus band [28,42] +30 over BF", "ts": 1794736337}
+{"request_index": 53, "mechanism": "target residual min+30 (-abs(r-(min+30)))", "ts": 1794736371}
+{"request_index": 54, "mechanism": "band [30,45]+20 plus penalty [10,20]-20 over BF", "ts": 1794736412}
+{"request_index": 55, "mechanism": "band [28,42]+20 plus penalty [10,20]-25 over BF", "ts": 1794736454}
+{"request_index": 56, "mechanism": "pure bonus band [30,45] +25 over BF", "ts": 1794736490}
+{"request_index": 57, "mechanism": "count-gated band ([28,42]+20 only if >=6 bins)", "ts": 1794736521}
+{"request_index": 58, "mechanism": "spread gate (wide band [25,50] only if spread >= 15)", "ts": 1794736552}
+{"request_index": 59, "mechanism": "band [30,45]+20 plus penalty [46,55]-20 over BF", "ts": 1794736590}
+{"request_index": 60, "mechanism": "pure bonus band [25,50] +15 over BF", "ts": 1794736624}
+{"request_index": 61, "mechanism": "triangular sweet-band bonus peaking at leftover 35 (cross-seed test)", "ts": 1794736658}
+{"request_index": 62, "mechanism": "item-scaled wide band [25,50] reward=item/4 over BF (cross-seed test)", "ts": 1794736690}
+{"request_index": 63, "mechanism": "band [28,42]+20 plus penalty [43,55]-20 over BF", "ts": 1794736722}
+{"request_index": 64, "mechanism": "pure bonus band [25,45] +25 over BF", "ts": 1794736755}
+{"request_index": 65, "mechanism": "band [25,50]+25 plus penalty [55,75]-15 over BF", "ts": 1794736789}
+{"request_index": 66, "mechanism": "band [28,42]+20 plus penalty [6,20]-30 over BF", "ts": 1794736821}
+{"request_index": 67, "mechanism": "band [30,45]+20 plus penalty [6,20]-25 over BF", "ts": 1794736863}
+{"request_index": 68, "mechanism": "triangular sweet-band bonus peaking at leftover 45 over [35,55]", "ts": 1794736899}
+{"request_index": 69, "mechanism": "double bonus bands [25,50] +20 and [60,75] +10 over BF", "ts": 1794736933}
+{"request_index": 70, "mechanism": "band [25,45]+20 plus penalty [5,15]-20 over BF", "ts": 1794736966}
+{"request_index": 71, "mechanism": "item-scaled band [30,45] reward=item/4 over BF", "ts": 1794737003}
+{"request_index": 72, "mechanism": "double bonus bands [28,42] +15 and [55,70] +15 over BF (cross-seed test)", "ts": 1794737037}
+{"request_index": 73, "mechanism": "band [25,50]+20 plus penalty [0,5]-25 over BF", "ts": 1794737071}
+{"request_index": 74, "mechanism": "band [30,45]+20 plus penalty [10,20]-25 over BF", "ts": 1794737105}
+{"request_index": 75, "mechanism": "band [25,50]+20 plus penalty [10,20]-20 over BF", "ts": 1794737136}
+{"request_index": 76, "mechanism": "band [28,42]+20 plus penalty [10,20]-15 over BF", "ts": 1794737169}
+{"request_index": 77, "mechanism": "band [25,45]+20 plus penalty [46,60]-25 over BF", "ts": 1794737208}
+{"request_index": 78, "mechanism": "band [30,45]+20 plus penalty [5,15]-20 over BF (cross-seed test)", "ts": 1794737243}
+{"request_index": 79, "mechanism": "band [28,42]+20 plus penalty [10,20]-30 over BF", "ts": 1794737280}
+{"request_index": 80, "mechanism": "band [28,42]+20 plus penalty [6,20]-15 over BF (cross-seed test)", "ts": 1794737313}
+{"request_index": 81, "mechanism": "triangular bonus peaking at 40 plus penalty [6,20]-25 over BF", "ts": 1794737347}
+{"request_index": 82, "mechanism": "item-scaled band [28,42]/[10,20] reward=item/2, penalty=item/4", "ts": 1794737378}
+{"request_index": 83, "mechanism": "band [28,42]+20 plus penalty [10,20]-20 over BF", "ts": 1794737471}
+{"request_index": 84, "mechanism": "band [30,45]+20 plus penalty [6,20]-15 over BF", "ts": 1794737503}
+{"request_index": 85, "mechanism": "band [30,45]+20 plus penalty [46,60]-20 over BF", "ts": 1794737537}
+{"request_index": 86, "mechanism": "band [28,42]+25 plus penalty [10,20]-25 over BF", "ts": 1794737567}
+{"request_index": 87, "mechanism": "band [30,45]+25 plus penalty [10,20]-25 over BF", "ts": 1794737603}
+{"request_index": 88, "mechanism": "item-scaled wide band [25,50]/[6,20] reward=item/2, penalty=item/4", "ts": 1794737640}
+{"request_index": 89, "mechanism": "band [28,42]+20 plus penalty [6,20]-20 over BF", "ts": 1794737675}
+{"request_index": 90, "mechanism": "band [25,50]+20 plus penalty [6,20]-25 over BF", "ts": 1794737706}
+{"request_index": 91, "mechanism": "band [30,45]+20 plus penalty [6,20]-20 over BF", "ts": 1794737738}
+{"request_index": 92, "mechanism": "band [30,45]+20 plus penalty [10,20]-15 over BF", "ts": 1794737772}
+{"request_index": 93, "mechanism": "band [28,42]+25 plus penalty [6,20]-25 over BF", "ts": 1794737803}
+{"request_index": 94, "mechanism": "band [30,45]+25 plus penalty [6,20]-20 over BF", "ts": 1794737835}
+{"request_index": 95, "mechanism": "band [25,50]+25 plus penalty [10,20]-25 over BF", "ts": 1794737869}
+{"request_index": 96, "mechanism": "band [28,42]+20 plus penalty [6,20]-25 over BF", "ts": 1794737902}
+{"request_index": 97, "mechanism": "double bonus bands [30,45] +20 and [60,75] +10 over BF", "ts": 1794737935}
+{"request_index": 98, "mechanism": "band [25,45]+20 plus penalty [6,20]-20 over BF", "ts": 1794737970}
+{"request_index": 99, "mechanism": "band [25,50]+20 plus penalty [10,20]-25 over BF", "ts": 1794738000}
+{"request_index": 100, "mechanism": "double bonus bands [28,42] +20 and [60,75] +15 over BF", "ts": 1794738031}

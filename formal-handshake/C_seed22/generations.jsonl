@@ -1,0 +1,100 @@
+{"request_index": 1, "mechanism": "ratio band leftover in [1.5*item,2.5*item]+25", "ts": 1794734219}
+{"request_index": 2, "mechanism": "room-for-another bonus r>=2*item +25", "ts": 1794734254}
+{"request_index": 3, "mechanism": "proportional band leftover in [item/2,item]+20", "ts": 1794734293}
+{"request_index": 4, "mechanism": "sweet band [30,45]+20 gated item>=50", "ts": 1794734325}
+{"request_index": 5, "mechanism": "emptiest-bin bonus r==max(bins) +30", "ts": 1794734354}
+{"request_index": 6, "mechanism": "sweet band [20,35]+20", "ts": 1794734386}
+{"request_index": 7, "mechanism": "bonus leftover>=half of max leftover +20", "ts": 1794734416}
+{"request_index": 8, "mechanism": "tight-pack bonus leftover in [0,10]+20", "ts": 1794734445}
+{"request_index": 9, "mechanism": "mod-5 bonus gated leftover>=20 +20", "ts": 1794734473}
+{"request_index": 10, "mechanism": "very-tight bonus leftover<=item/3 +15", "ts": 1794734503}
+{"request_index": 11, "mechanism": "sweet band [55,75]+20", "ts": 1794734532}
+{"request_index": 12, "mechanism": "penalty leftover in [10,20]-15", "ts": 1794734560}
+{"request_index": 13, "mechanism": "below-median residual bonus +20", "ts": 1794734588}
+{"request_index": 14, "mechanism": "sweet band [30,45]+20, mid penalty [8,22]-20", "ts": 1794734621}
+{"request_index": 15, "mechanism": "sweet band [30,45]+20, mid penalty [8,22]-30", "ts": 1794734649}
+{"request_index": 16, "mechanism": "room-for-another bonus leftover>item +15", "ts": 1794734679}
+{"request_index": 17, "mechanism": "sweet band [30,45]+20, mid penalty [8,22]-25", "ts": 1794734708}
+{"request_index": 18, "mechanism": "sweet band [30,45]+15, mid penalty [8,22]-20", "ts": 1794734736}
+{"request_index": 19, "mechanism": "winning combo, band gated len>=5", "ts": 1794734766}
+{"request_index": 20, "mechanism": "winning combo + tiny penalty [0,5]-10", "ts": 1794734796}
+{"request_index": 21, "mechanism": "winning combo, band gated item odd", "ts": 1794734824}
+{"request_index": 22, "mechanism": "winning combo, penalty gated len>=5", "ts": 1794734855}
+{"request_index": 23, "mechanism": "band or exact-fit +20", "ts": 1794734883}
+{"request_index": 24, "mechanism": "winning combo, band [30,42]", "ts": 1794734911}
+{"request_index": 25, "mechanism": "winning combo + upper penalty [50,70]-10", "ts": 1794734940}
+{"request_index": 26, "mechanism": "winning combo, band gated len<6", "ts": 1794734970}
+{"request_index": 27, "mechanism": "exact-multiple bonus leftover%item==0 +25", "ts": 1794734999}
+{"request_index": 28, "mechanism": "winning combo + gap penalty [23,29]-15", "ts": 1794735029}
+{"request_index": 29, "mechanism": "winning combo, penalty only on emptiest bin", "ts": 1794735061}
+{"request_index": 30, "mechanism": "sweet band [30,45]+20, penalty [10,25]-20", "ts": 1794735092}
+{"request_index": 31, "mechanism": "winning combo, penalty gated leftover<item", "ts": 1794735122}
+{"request_index": 32, "mechanism": "winning combo, penalty -15", "ts": 1794735150}
+{"request_index": 33, "mechanism": "gap penalty [23,29]-20 alone", "ts": 1794735178}
+{"request_index": 34, "mechanism": "band [30,45]+20 + leftover>item +15", "ts": 1794735210}
+{"request_index": 35, "mechanism": "winning combo + gap penalty when item<40", "ts": 1794735238}
+{"request_index": 36, "mechanism": "winning combo, band +30 when item<40", "ts": 1794735268}
+{"request_index": 37, "mechanism": "very-roomy bonus leftover>=90 +20", "ts": 1794735299}
+{"request_index": 38, "mechanism": "winning combo + upper bonus [60,80]+10", "ts": 1794735330}
+{"request_index": 39, "mechanism": "winning combo + upper bonus [60,80]+20", "ts": 1794735358}
+{"request_index": 40, "mechanism": "winning combo + upper bonus gated item>=50", "ts": 1794735391}
+{"request_index": 41, "mechanism": "penalty [10,25] variant + upper bonus +20", "ts": 1794735423}
+{"request_index": 42, "mechanism": "winning combo, band gated leftover>=2*item/3", "ts": 1794735451}
+{"request_index": 43, "mechanism": "winning combo, band only upper-half decade", "ts": 1794735483}
+{"request_index": 44, "mechanism": "peaked target residual=25", "ts": 1794735511}
+{"request_index": 45, "mechanism": "winning combo, band gated even bin count", "ts": 1794735543}
+{"request_index": 46, "mechanism": "winning combo, both gated even bin count", "ts": 1794735571}
+{"request_index": 47, "mechanism": "even-count band combo + exact-fit +500", "ts": 1794735606}
+{"request_index": 48, "mechanism": "winning combo, band gated item%3==1", "ts": 1794735634}
+{"request_index": 49, "mechanism": "even-count band combo + upper bonus +20", "ts": 1794735669}
+{"request_index": 50, "mechanism": "upper-half decade band + leftover>item +15", "ts": 1794735698}
+{"request_index": 51, "mechanism": "upper combo, band gated item odd", "ts": 1794735728}
+{"request_index": 52, "mechanism": "even-count band + penalty [10,25]-20", "ts": 1794735763}
+{"request_index": 53, "mechanism": "even-count band combo, penalty -25", "ts": 1794735791}
+{"request_index": 54, "mechanism": "even-count band + penalty [5,25]-20", "ts": 1794735819}
+{"request_index": 55, "mechanism": "winning combo, band gated len%3==1", "ts": 1794735848}
+{"request_index": 56, "mechanism": "even-count band combo, penalty -30", "ts": 1794735878}
+{"request_index": 57, "mechanism": "even-count band combo, bonus +15", "ts": 1794735907}
+{"request_index": 58, "mechanism": "even-count band [25,40] combo", "ts": 1794735935}
+{"request_index": 59, "mechanism": "even-count combo + gap penalty [23,29]-15", "ts": 1794735964}
+{"request_index": 60, "mechanism": "len%3==1 band combo + upper bonus +20", "ts": 1794736000}
+{"request_index": 61, "mechanism": "len%3==0 band combo + upper bonus +20", "ts": 1794736032}
+{"request_index": 62, "mechanism": "winning combo, band gated mean residual<40", "ts": 1794736062}
+{"request_index": 63, "mechanism": "winning combo, band gated min>30", "ts": 1794736091}
+{"request_index": 64, "mechanism": "item%3==1 band combo + upper bonus +20", "ts": 1794736124}
+{"request_index": 65, "mechanism": "item%3==1 band combo + exact-fit +500", "ts": 1794736156}
+{"request_index": 66, "mechanism": "winning combo, band gated r<2*item", "ts": 1794736185}
+{"request_index": 67, "mechanism": "even-count band combo, band gated r<2*item", "ts": 1794736213}
+{"request_index": 68, "mechanism": "item%3==1 band + penalty [10,25]-20", "ts": 1794736246}
+{"request_index": 69, "mechanism": "double-gated band + upper bonus +20", "ts": 1794736281}
+{"request_index": 70, "mechanism": "winning combo, band gated sum<200", "ts": 1794736311}
+{"request_index": 71, "mechanism": "even-count combo + extra +10 in band item odd", "ts": 1794736340}
+{"request_index": 72, "mechanism": "even-count + r>=2*item gated band combo", "ts": 1794736379}
+{"request_index": 73, "mechanism": "even-count + r>=2*item band + exact-fit +500", "ts": 1794736408}
+{"request_index": 74, "mechanism": "ratio band r/item in [1.2,1.8]+20", "ts": 1794736437}
+{"request_index": 75, "mechanism": "even-count combo + ratio bonus +10", "ts": 1794736465}
+{"request_index": 76, "mechanism": "even-count band [35,50] combo", "ts": 1794736496}
+{"request_index": 77, "mechanism": "band-not-emptiest combo + upper +20", "ts": 1794736525}
+{"request_index": 78, "mechanism": "even-count combo, band +25 when len<=3", "ts": 1794736554}
+{"request_index": 79, "mechanism": "winning combo, band only leftover%3==1", "ts": 1794736583}
+{"request_index": 80, "mechanism": "even-count band [28,45] combo", "ts": 1794736616}
+{"request_index": 81, "mechanism": "even-count band [28,45] + exact-fit +500", "ts": 1794736647}
+{"request_index": 82, "mechanism": "even-count band [28,45] penalty -25", "ts": 1794736676}
+{"request_index": 83, "mechanism": "band on fullest +30, even-count gate", "ts": 1794736708}
+{"request_index": 84, "mechanism": "even-count ratio band combo", "ts": 1794736741}
+{"request_index": 85, "mechanism": "even-count ratio band [2.0,3.0]+20", "ts": 1794736770}
+{"request_index": 86, "mechanism": "even-count band lower half [30,34]", "ts": 1794736799}
+{"request_index": 87, "mechanism": "even-count combo + extra +15 in band len<=2", "ts": 1794736829}
+{"request_index": 88, "mechanism": "even-count band [28,45] penalty -30", "ts": 1794736870}
+{"request_index": 89, "mechanism": "even-count band [28,45] penalty -25 + leftover>item +15", "ts": 1794736899}
+{"request_index": 90, "mechanism": "even-count band [28,45] penalty [5,25]-25", "ts": 1794736929}
+{"request_index": 91, "mechanism": "even-count band [28,45] bonus +15 penalty -25", "ts": 1794736958}
+{"request_index": 92, "mechanism": "even-count band penalty -25 + upper +20", "ts": 1794736989}
+{"request_index": 93, "mechanism": "even-count band [30,48] penalty -25", "ts": 1794737017}
+{"request_index": 94, "mechanism": "even-count band penalty -25 + ratio bonus +10", "ts": 1794737046}
+{"request_index": 95, "mechanism": "even-count band penalty -25 + upper [55,75]+20", "ts": 1794737074}
+{"request_index": 96, "mechanism": "band on fullest +30 even-count + upper +20", "ts": 1794737107}
+{"request_index": 97, "mechanism": "double-gated band penalty -25", "ts": 1794737135}
+{"request_index": 98, "mechanism": "double-gated band [30,48] penalty -25", "ts": 1794737166}
+{"request_index": 99, "mechanism": "double-gated band penalty -25 + upper +10", "ts": 1794737196}
+{"request_index": 100, "mechanism": "even-count band [28,45] penalty -30 + upper +20", "ts": 1794737227}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Apply the wide [25,50] bonus only when the residual spread is at least 15, using pure Best Fit when bins are tightly clustered.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if max(bins) - min(bins) >= 15 and 25 <= r - item <= 50 else 0) for r in bins]\n```"}

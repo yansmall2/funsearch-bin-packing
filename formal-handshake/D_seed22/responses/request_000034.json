@@ -1,0 +1,1 @@
+{"text": "Strategy: Target leftover 40 with a steeper penalty above the target than below, preferring slightly tight placements over roomy ones when both miss the ideal.\n\n```python\ndef priority(item, bins):\n    return [-abs((r - item) - 40) - (abs((r - item) - 40) if r - item > 40 else 0) for r in bins]\n```"}

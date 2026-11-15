@@ -1,0 +1,1 @@
+{"text": "Strategy: Target bins where the item fills five sixths of the residual, a very tight fill fraction.\n\n```python\ndef priority(item, bins):\n    return [-abs(item / r - 5 / 6) for r in bins]\n```"}

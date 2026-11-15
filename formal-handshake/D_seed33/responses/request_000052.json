@@ -1,0 +1,1 @@
+{"text": "Strategy: Target a leftover of three item sizes, keeping room for three more similar items.\n\n```python\ndef priority(item, bins):\n    return [-abs((r - item) - 3 * item) for r in bins]\n```"}

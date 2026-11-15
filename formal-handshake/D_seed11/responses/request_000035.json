@@ -1,0 +1,1 @@
+{"text": "Strategy: Use different sweet bands by item parity: even items aim at leftover [28,42], odd items at [30,45], testing whether parity-specific targeting beats a single band.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if item % 2 == 0 and 28 <= r - item <= 42 else 0) + (20 if item % 2 == 1 and 30 <= r - item <= 45 else 0) for r in bins]\n```"}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Apply the [28,42] sweet-band bonus only when the residual spread is wide, 25 or more, and use pure Best Fit when bins are tightly clustered.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if max(bins) - min(bins) >= 25 and 28 <= r - item <= 42 else 0) for r in bins]\n```"}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Stop discriminating once a leftover exceeds forty: treat every sufficiently loose bin as equally good and let Best Fit decide only among tighter ones. It may help by not over-optimizing slack, but may fail by picking the first loose bin instead of the best one.\n\n```python\ndef priority(item, bins):\n    return [-min(r - item, 40) for r in bins]\n```\n"}

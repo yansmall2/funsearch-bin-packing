@@ -1,0 +1,1 @@
+{"text": "Strategy: Take the loosest bin only when it still leaves at most 40 units free, otherwise fall back to Best Fit, so loose placements never waste a nearly-empty bin.\n\n```python\ndef priority(item, bins):\n    return [1000 if r == max(bins) and r - item <= 40 else -(r - item) for r in bins]\n```"}

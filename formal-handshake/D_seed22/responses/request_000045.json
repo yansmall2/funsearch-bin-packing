@@ -1,0 +1,1 @@
+{"text": "Strategy: Penalize placements leaving more than three item sizes free, discouraging wastefully roomy bins, with Best Fit ordering elsewhere.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) - (25 if r - item > 3 * item else 0) for r in bins]\n```"}

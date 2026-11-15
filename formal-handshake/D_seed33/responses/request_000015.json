@@ -1,0 +1,1 @@
+{"text": "Strategy: Aim for a post-placement leftover of exactly twenty-five, a smaller fixed target than the thirty-to-forty range tried before. It may help if twenty-five is the most common useful leftover, but may fail if the best leftover size varies with the item.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - item - 25) for r in bins]\n```\n"}

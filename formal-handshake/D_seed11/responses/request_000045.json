@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward placements leaving a small positive leftover under half the item size, the opposite of the usual sliver penalties, testing whether tight leftovers are actually useful.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (25 if r - item > 0 and r - item < item / 2 else 0) for r in bins]\n```"}

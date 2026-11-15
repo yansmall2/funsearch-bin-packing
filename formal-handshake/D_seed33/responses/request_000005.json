@@ -1,0 +1,1 @@
+{"text": "Strategy: Aim for a bin twice as loose as the tightest feasible bin, building a ladder of residual sizes instead of always taking the tightest. It may help by keeping varied bin sizes available, but may fail if the doubled target rarely matches a real bin.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - 2 * min(bins)) for r in bins]\n```\n"}

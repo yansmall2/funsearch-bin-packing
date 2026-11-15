@@ -1,0 +1,1 @@
+{"text": "Strategy: Combine the triangular bonus peaking at leftover 40 with a penalty on the [6,20] sliver band.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (30 - abs((r - item) - 40) if 30 <= r - item <= 50 else 0) - (25 if 6 <= r - item <= 20 else 0) for r in bins]\n```"}

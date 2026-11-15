@@ -1,0 +1,1 @@
+{"text": "Strategy: Target a residual 20 above the tightest bin, staying close to Best Fit while deliberately leaving a small usable gap instead of the tightest fit.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - (min(bins) + 20)) for r in bins]\n```"}

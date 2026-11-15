@@ -1,0 +1,1 @@
+{"text": "Strategy: Score each bin by negative squared distance from leftover 35, so bins landing near the ideal residual win and the preference fades smoothly rather than switching abruptly at band edges.\n\n```python\ndef priority(item, bins):\n    return [-((r - item - 35) ** 2) / 50 for r in bins]\n```"}

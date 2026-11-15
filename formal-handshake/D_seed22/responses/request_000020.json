@@ -1,0 +1,1 @@
+{"text": "Strategy: Aim for a post-placement leftover of exactly the item plus ten, leaving room for one more item plus a small margin. It may help by keeping bins pairable with a slightly larger next item, but may fail if the exact target rarely matches a real bin.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - item - (item + 10)) for r in bins]\n```\n"}

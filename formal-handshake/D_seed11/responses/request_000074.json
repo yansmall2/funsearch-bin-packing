@@ -1,0 +1,1 @@
+{"text": "Strategy: Combine the [30,45] sweet-band bonus with a penalty on the [10,20] sliver band, testing the combination that performed well in another seed.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if 30 <= r - item <= 45 else 0) - (20 if 10 <= r - item <= 20 else 0) for r in bins]\n```"}

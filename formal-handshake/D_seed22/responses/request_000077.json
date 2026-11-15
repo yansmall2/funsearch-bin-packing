@@ -1,0 +1,1 @@
+{"text": "Strategy: Combine the wide [25,45] bonus with a strong penalty just above it, [46,60].\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if 25 <= r - item <= 45 else 0) - (25 if 46 <= r - item <= 60 else 0) for r in bins]\n```"}

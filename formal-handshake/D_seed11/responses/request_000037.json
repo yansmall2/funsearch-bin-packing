@@ -1,0 +1,1 @@
+{"text": "Strategy: Use a tiered bonus that pays most for leftovers in [30,35], less for [36,45], least for [46,55], creating a smooth preference slope across the sweet region.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (40 if 30 <= r - item <= 35 else 20 if 36 <= r - item <= 45 else 10 if 46 <= r - item <= 55 else 0) for r in bins]\n```"}

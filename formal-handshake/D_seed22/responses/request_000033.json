@@ -1,0 +1,1 @@
+{"text": "Strategy: Give +30 to placements leaving only 1 to 5 units free, nearly closing the bin, while keeping Best Fit ordering for all other residuals.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (30 if 1 <= r - item <= 5 else 0) for r in bins]\n```"}

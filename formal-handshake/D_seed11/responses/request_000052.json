@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward bins in the middle-upper slice of the spread, 50 to 70 percent from tightest to loosest.\n\n```python\ndef priority(item, bins):\n    mn = min(bins)\n    mx = max(bins)\n    return [-(r - item) + (20 if mx > mn and (r - mn) * 10 >= (mx - mn) * 5 and (r - mn) * 10 <= (mx - mn) * 7 else 0) for r in bins]\n```"}

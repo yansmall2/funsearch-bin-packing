@@ -1,0 +1,1 @@
+{"text": "Strategy: Target a residual 10 above the tightest bin, a closer near-Best-Fit aim than the earlier min+20 test.\n\n```python\ndef priority(item, bins):\n    return [-abs(r - (min(bins) + 10)) for r in bins]\n```"}

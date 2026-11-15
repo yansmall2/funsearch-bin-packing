@@ -1,0 +1,1 @@
+{"text": "Strategy: Aim for a post-placement leftover of 80, the largest target tried so far.\n\n```python\ndef priority(item, bins):\n    return [-abs((r - item) - 80) for r in bins]\n```"}

@@ -1,0 +1,1 @@
+{"text": "Strategy: Reward leftovers divisible by 3, testing whether a modular tiling preference creates better residual patterns than the earlier modulo 5 and 10 tests.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if (r - item) % 3 == 0 else 0) for r in bins]\n```"}

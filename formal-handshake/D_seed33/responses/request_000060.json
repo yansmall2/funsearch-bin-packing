@@ -1,0 +1,1 @@
+{"text": "Strategy: Use a +15 bonus on the [30,45] sweet band alone, testing a weaker bonus on the wider band.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (15 if 30 <= r - item <= 45 else 0) for r in bins]\n```"}

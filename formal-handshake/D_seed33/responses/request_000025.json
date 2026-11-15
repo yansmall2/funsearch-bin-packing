@@ -1,0 +1,1 @@
+{"text": "Strategy: Test the upper-shifted pure bonus band, rewarding leftovers between thirty and forty-five with no penalty. It may help if the higher window suits this seed, but may fail if the lower edge matters more than the upper one.\n\n```python\ndef priority(item, bins):\n    return [-(r - item) + (20 if r - item >= 30 and r - item <= 45 else 0) for r in bins]\n```\n"}
