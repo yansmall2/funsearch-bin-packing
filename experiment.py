@@ -15,6 +15,7 @@ from funpack.programs import Program, BF_CODE, FF_CODE
 from funpack.prompts import ENHANCED_VERSIONS
 from funpack.screening import COLLISION_POLICIES
 from funpack.providers import ApiProvider, OfflineProvider
+from funpack.handshake_provider import HandshakeProvider
 from funpack.protocol import core_source_hashes, load_protocol, public_api_config, validate_runtime
 from funpack.search import ARMS, run_search
 from funpack.storage import digest, environment, read_json, source_hashes, write_json
@@ -86,8 +87,12 @@ def main(argv=None):
     parser.add_argument("--stage", choices=["baselines", "search", "all"], default="all")
     parser.add_argument("--data", default="data")
     parser.add_argument("--out_dir", default="run_1")
-    parser.add_argument("--provider", choices=["offline", "api"], default="offline")
+    parser.add_argument("--provider", choices=["offline", "api", "handshake"], default="offline")
     parser.add_argument("--api-config", default="configs/api.local.json")
+    parser.add_argument("--handshake-dir", default="handshake",
+                        help="Base dir for the Muse handshake provider (one subdir per run). 0 CNY, no paid API.")
+    parser.add_argument("--handshake-timeout-seconds", type=float, default=1800,
+                        help="How long one handshake generation may take before the run stops on provider error.")
     parser.add_argument("--allow-paid", action="store_true")
     parser.add_argument("--arms", nargs="+", choices=list(ARMS), default=list(ARMS))
     parser.add_argument("--seeds", nargs="+", type=int, default=[11, 22, 33])
@@ -195,7 +200,13 @@ def main(argv=None):
                 print(f"{run_name}: {args.provider}; {args.calls} candidate requests. "
                       + ("Frozen formal search; not a final test." if protocol else
                          ("Plumbing check, not LLM evidence." if api is None else "Pilot; not a final test.")), flush=True)
-                provider = api if api is not None else OfflineProvider(seed=seed)
+                if api is not None:
+                    provider = api
+                elif args.provider == "handshake":
+                    provider = HandshakeProvider(args.handshake_dir, run_name,
+                                                 timeout_seconds=args.handshake_timeout_seconds)
+                else:
+                    provider = OfflineProvider(seed=seed)
                 started = time.perf_counter()
                 info = run_search(instances, probes, provider, config, out_dir / run_name)
                 selection = select_validation(out_dir / run_name, validation, args.validation_timeout_seconds)
