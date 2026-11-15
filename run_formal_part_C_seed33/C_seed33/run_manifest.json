@@ -1,0 +1,49 @@
+{
+  "config": {
+    "arm": "C",
+    "seed": 33,
+    "calls": 100,
+    "islands": 4,
+    "reset_every": 50,
+    "audit_rate": 0.1,
+    "temperature": 1.0,
+    "enhanced_prompt_version": "mechanism_v3",
+    "collision_policy": "disable_on_mismatch_v1",
+    "evaluation_timeout_seconds": 30,
+    "protocol_id": "3eb1f24db9215327aab4b60e4aa1147bf57278cf15315fcae922364b0d80f97c"
+  },
+  "method": {
+    "prompt_version": "basic_v1",
+    "enhanced_prompt_version": "mechanism_v3",
+    "screening_enabled": true,
+    "collision_policy": "disable_on_mismatch_v1"
+  },
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "executable": "/usr/bin/python3",
+    "platform": "Linux-7.0.0-44-generic-x86_64-with-glibc2.39",
+    "utc_time": "2026-11-15T09:15:43.786107+00:00"
+  },
+  "search_context_hash": "ddc83ff2e843ce13716b539c3d3b5160388a47fa719d2ed0f06ca963b8905ef0",
+  "search_hash": "ef0f42e06ce9cb9354f3dea83382643cc143fdcd640595171ea01abf9c476a97",
+  "probe_hash": "e8b5c75384b4c67d208b4d0af353e499f58954e4326ca2dce1ca4ec1d15a2511",
+  "source_hashes": {
+    "__init__.py": "720e69c3b56cb12c0f62b7908cc92843ff350e11a46db12361f8320fcff33c48",
+    "data.py": "0e4199f74105c88cf4fcfe69b1cd5a85bb1b097ff7c2bce8083be1c691fca4dc",
+    "database.py": "28ea4b08bf322ded891411539702171314e0dd08938b0b392b6ba0ca1b45df0e",
+    "handshake_provider.py": "c345dfed8f78d8ce1752354bb76c8da9e18098a4d7e9dd9396433160e9588bf5",
+    "ledger.py": "8716a57ef4a96d371e41ac2dbe238ca0d950f61daf1f5cf329dda125c7fb8c31",
+    "packing.py": "70ad438ee4b954df903decbe601b8ebf07b0d5e6dfd284418608e7c385ab9ee3",
+    "programs.py": "4635155aa2dd714797227a270edbbaeed22f474047e93ce7768a1ce17d9e4bb8",
+    "prompts.py": "3fe8b25ea45179cd3497666cda87396b5494aa5867d6cec9248947009dca486f",
+    "protocol.py": "c47d6b7e92bef919d8312db9995eb8d39342ba4a0dcd9255bba7425bb8538e1b",
+    "providers.py": "71a17a703f9acf83bfefdcb6a6c0c3f33fb42173e52f3e4c8f3318c7612b686b",
+    "screening.py": "722fb103769b47e1f27e3a089d53d18b271cf5327b7d5d8c1a28d2b6ebca11ac",
+    "search.py": "8bc8058c7f61c396ad2778f48cf590a5adb4cbc986b29993565a4ef0e0b11dcc",
+    "storage.py": "5f412b8386cfcff903b10339f3c0649868db0450ac9c673674e639db829e8000"
+  },
+  "dataset_role": "search",
+  "heldout_evaluated": false,
+  "provider_class": "HandshakeProvider",
+  "evidence_scope": "formal_comparison"
+}
