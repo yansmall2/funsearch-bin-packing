@@ -1,0 +1,1 @@
+{"arms":["A","B","C","D"],"audit_rate":0.1,"calls_per_run":100,"collision_policy":"disable_on_mismatch_v1","database_temperature":1.0,"enhanced_prompt_version":"mechanism_v3","evaluation_timeout_seconds":30,"final_timeout_seconds":30,"islands":4,"provider":"handshake","reset_every":50,"schema_version":2,"seeds":[11,22,33],"status":"draft","validation_timeout_seconds":30}

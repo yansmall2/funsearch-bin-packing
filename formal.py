@@ -25,7 +25,9 @@ def main(argv=None):
     draft.add_argument("--output", default="configs/formal-plan.draft.json")
     freeze = commands.add_parser("freeze", help="Freeze finalized plan, model configuration, code and data")
     freeze.add_argument("--plan", required=True)
-    freeze.add_argument("--api-config", required=True)
+    freeze.add_argument("--api-config", default=None)
+    freeze.add_argument("--handshake-config", default=None,
+                        help="Handshake provider config for provider='handshake' plans (no key, no payment)")
     freeze.add_argument("--data", default="data")
     freeze.add_argument("--output", required=True)
     run = commands.add_parser("run", help="Run all frozen arms/seeds; new budget authorization is needed")
@@ -55,7 +57,10 @@ def main(argv=None):
             stream.write("\n")
         print(f"Draft saved: {destination.resolve()}. No configuration frozen; no requests sent.")
     elif args.command == "freeze":
-        result = freeze_protocol(args.plan, args.api_config, args.data, args.output)
+        config_path = args.handshake_config or args.api_config
+        if config_path is None:
+            parser.error("freeze requires --api-config or --handshake-config")
+        result = freeze_protocol(args.plan, config_path, args.data, args.output)
         print(f"Protocol frozen: {result['protocol_id']}. No requests sent; held-out data not evaluated.")
     elif args.command == "seal":
         seal_candidates(args.protocol, args.study, args.data, args.output)

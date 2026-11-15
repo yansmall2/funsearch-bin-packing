@@ -91,6 +91,8 @@ def main(argv=None):
     parser.add_argument("--api-config", default="configs/api.local.json")
     parser.add_argument("--handshake-dir", default="handshake",
                         help="Base dir for the Muse handshake provider (one subdir per run). 0 CNY, no paid API.")
+    parser.add_argument("--handshake-config", default=None,
+                        help="Handshake provider config JSON (model/timeout/max_requests). Required for formal runs.")
     parser.add_argument("--handshake-timeout-seconds", type=float, default=1800,
                         help="How long one handshake generation may take before the run stops on provider error.")
     parser.add_argument("--allow-paid", action="store_true")
@@ -126,10 +128,16 @@ def main(argv=None):
     study_started = time.perf_counter()
     api = protocol = None
     api_config = read_json(args.api_config) if args.provider == "api" else None
+    handshake_config = None
+    if args.provider == "handshake" and args.handshake_config:
+        from funpack.protocol import normalize_handshake_config
+        handshake_config = normalize_handshake_config(read_json(args.handshake_config))
     data_dir = Path(args.data)
     if args.protocol:
         protocol = load_protocol(args.protocol, data_dir)
-        validate_runtime(protocol, args, api_config)
+        if protocol["plan"].get("provider") == "handshake" and handshake_config is None:
+            parser.error("formal handshake runs require --handshake-config")
+        validate_runtime(protocol, args, handshake_config if args.provider == "handshake" else api_config)
     if args.provider == "api":
         if not api_config.get("ledger_path"):
             parser.error("paid API runs require a persistent ledger_path; see the CNY pilot example")
@@ -175,6 +183,8 @@ def main(argv=None):
             "max_requests", "extra_body", "budget") if key in api.config}
         if protocol:
             manifest["api_config"] = public_api_config(api.config)
+    if handshake_config is not None:
+        manifest["provider_config"] = handshake_config
     write_json(out_dir / "study.json", manifest)
     if args.stage in ("baselines", "all"):
         started = time.perf_counter()
@@ -203,8 +213,10 @@ def main(argv=None):
                 if api is not None:
                     provider = api
                 elif args.provider == "handshake":
+                    timeout = (handshake_config["timeout_seconds"] if handshake_config is not None
+                               else args.handshake_timeout_seconds)
                     provider = HandshakeProvider(args.handshake_dir, run_name,
-                                                 timeout_seconds=args.handshake_timeout_seconds)
+                                                 timeout_seconds=timeout)
                 else:
                     provider = OfflineProvider(seed=seed)
                 started = time.perf_counter()

@@ -26,7 +26,7 @@ from .storage import digest, environment, read_json, write_json
 
 CORE_FILES = ("experiment.py", "formal.py") + tuple(
     "funpack/" + name + ".py" for name in (
-        "__init__", "data", "database", "ledger", "packing", "programs", "prompts",
+        "__init__", "data", "database", "handshake_provider", "ledger", "packing", "programs", "prompts",
         "providers", "protocol", "screening", "search", "storage"))
 NONHELDOUT_FILES = ("development.json", "search.json", "validation.json", "probes.json")
 HELDOUT_FILES = ("heldout/test.json", "heldout/or3.json")
@@ -36,6 +36,26 @@ SELECTION_RULE = "search top5; validation mean; search mean; code length; hash"
 PUBLIC_API_FIELDS = ("base_url", "model", "expected_model_version", "api_key_env",
                      "ledger_path", "temperature", "max_tokens", "timeout_seconds",
                      "max_requests", "extra_body", "budget")
+PUBLIC_HANDSHAKE_FIELDS = ("provider", "model", "timeout_seconds", "max_requests")
+
+
+def normalize_handshake_config(config):
+    """Normalize a Muse handshake provider config. No secrets, no payment."""
+    _require(isinstance(config, dict), "handshake configuration must be an object")
+    unknown = set(config) - set(PUBLIC_HANDSHAKE_FIELDS)
+    _require(not unknown, "handshake configuration has unsupported fields")
+    _require(config.get("provider") == "handshake", "handshake provider must be 'handshake'")
+    model = config.get("model")
+    _require(isinstance(model, str) and model.strip(), "handshake model must be explicitly configured")
+    timeout = config.get("timeout_seconds")
+    _require(type(timeout) in (int, float) and math.isfinite(timeout) and timeout > 0,
+             "handshake timeout_seconds must be positive")
+    max_requests = config.get("max_requests")
+    _require(type(max_requests) is int and max_requests > 0,
+             "handshake max_requests must be a positive integer")
+    _require(not _contains_secret_field(config), "handshake configuration must not contain credentials")
+    return {"provider": "handshake", "model": model, "timeout_seconds": timeout,
+            "max_requests": max_requests}
 
 
 def _now():
@@ -105,7 +125,7 @@ def public_api_config(config):
 
 
 def draft_plan():
-    return {"schema_version": 2, "status": "draft", "arms": ["A", "B", "C", "D"],
+    return {"schema_version": 2, "status": "draft", "provider": "api", "arms": ["A", "B", "C", "D"],
             "seeds": [11, 22, 33], "calls_per_run": None, "islands": 4,
             "reset_every": 50, "audit_rate": 0.1, "database_temperature": 1.0,
             "enhanced_prompt_version": "mechanism_v3", "collision_policy": "disable_on_mismatch_v1",
@@ -117,6 +137,7 @@ def _validate_plan(plan):
     _require(isinstance(plan, dict) and set(plan) == set(draft_plan()),
              "plan fields must match the draft schema")
     _require(plan["schema_version"] == 2 and plan["status"] == "draft", "invalid plan schema/status")
+    _require(plan.get("provider") in ("api", "handshake"), "plan provider must be 'api' or 'handshake'")
     _require(plan["enhanced_prompt_version"] in ENHANCED_VERSIONS, "unknown enhanced prompt version")
     _require(plan["collision_policy"] in COLLISION_POLICIES, "unknown collision policy")
     _require(plan["arms"] == ["A", "B", "C", "D"], "formal comparison requires all four arms A-D")
@@ -160,17 +181,29 @@ def _data_snapshot(data_dir):
             "heldout_files": {name: files[name]["sha256"] for name in HELDOUT_FILES}}
 
 
-def freeze_protocol(plan_path, api_config_path, data_dir, output_path, source_root=None):
-    """Write a prospective protocol; never enables/calls a provider or reads tests."""
+def freeze_protocol(plan_path, config_path, data_dir, output_path, source_root=None):
+    """Write a prospective protocol; never enables/calls a provider or reads tests.
+
+    config_path is the API configuration for provider="api" or the handshake
+    configuration for provider="handshake" (no key, no payment, no ledger).
+    """
     plan = read_json(plan_path)
     _validate_plan(plan)
-    config = read_json(api_config_path)
-    _require(config.get("enabled") is True, "resolve the API configuration before freezing")
-    public = public_api_config(config)
+    config = read_json(config_path)
     requests = len(plan["arms"]) * len(plan["seeds"]) * plan["calls_per_run"]
-    _require(public["max_requests"] >= requests, "API request cap cannot cover the complete formal comparison")
+    if plan.get("provider") == "handshake":
+        provider_config = normalize_handshake_config(config)
+        _require(provider_config["max_requests"] >= requests,
+                 "handshake request cap cannot cover the complete formal comparison")
+        api_public = None
+    else:
+        _require(config.get("enabled") is True, "resolve the API configuration before freezing")
+        provider_config = None
+        api_public = public_api_config(config)
+        _require(api_public["max_requests"] >= requests, "API request cap cannot cover the complete formal comparison")
     payload = {"schema_version": 2, "kind": "formal_protocol", "frozen_at_utc": _now(),
-               "plan": plan, "api_config": public, "total_planned_requests": requests,
+               "plan": plan, "api_config": api_public, "provider_config": provider_config,
+               "total_planned_requests": requests,
                "source_hashes": core_source_hashes(source_root), **_data_snapshot(data_dir),
                "python_version": platform.python_version(),
                "heldout_evaluated": False,
@@ -195,13 +228,22 @@ def load_protocol(path, data_dir, source_root=None):
     return frozen
 
 
-def validate_runtime(protocol, args, api_config):
-    """Reject runtime overrides before a paid provider is created."""
+def validate_runtime(protocol, args, provider_config):
+    """Reject runtime overrides before a provider is created.
+
+    For provider="api", provider_config is the API configuration and arms/seeds
+    must match the plan exactly. For provider="handshake", provider_config is the
+    handshake configuration and arms/seeds may be a nonempty subset of the plan,
+    so one (arm, seed) part can run per process; the seal step still requires
+    every arm and seed exactly once in the merged study.
+    """
     args = vars(args) if not isinstance(args, dict) else args
-    _require(args.get("provider") == "api" and args.get("stage") == "all",
-             "formal runs require provider=api and stage=all")
     plan = protocol["plan"]
-    mapping = {"calls": "calls_per_run", "arms": "arms", "seeds": "seeds", "islands": "islands",
+    provider = plan.get("provider", "api")
+    _require(args.get("stage") == "all", "formal runs require stage=all")
+    _require(args.get("provider") == provider,
+             "formal runs require provider=" + provider)
+    mapping = {"calls": "calls_per_run", "islands": "islands",
                "reset_every": "reset_every", "audit_rate": "audit_rate",
                "database_temperature": "database_temperature",
                "enhanced_prompt_version": "enhanced_prompt_version", "collision_policy": "collision_policy",
@@ -209,8 +251,20 @@ def validate_runtime(protocol, args, api_config):
                "validation_timeout_seconds": "validation_timeout_seconds"}
     for argument, field in mapping.items():
         _require(args.get(argument) == plan[field], "runtime setting differs from protocol: " + argument)
-    _require(api_config.get("enabled") is True, "formal API configuration must be enabled")
-    _require(public_api_config(api_config) == protocol["api_config"],
+    if provider == "handshake":
+        _require(isinstance(args.get("arms"), list) and args["arms"]
+                 and set(args["arms"]) <= set(plan["arms"]) and len(args["arms"]) == len(set(args["arms"])),
+                 "formal handshake arms must be a nonempty subset of the frozen plan")
+        _require(isinstance(args.get("seeds"), list) and args["seeds"]
+                 and set(args["seeds"]) <= set(plan["seeds"]) and len(args["seeds"]) == len(set(args["seeds"])),
+                 "formal handshake seeds must be a nonempty subset of the frozen plan")
+        _require(provider_config == protocol.get("provider_config"),
+                 "provider configuration differs from frozen protocol")
+        return
+    _require(args.get("arms") == plan["arms"] and args.get("seeds") == plan["seeds"],
+             "formal runs require the frozen arms and seeds")
+    _require(provider_config.get("enabled") is True, "formal API configuration must be enabled")
+    _require(public_api_config(provider_config) == protocol["api_config"],
              "API configuration differs from frozen protocol")
 
 
@@ -264,7 +318,11 @@ def _inspect_study(protocol, study_dir):
              "only a prospectively frozen formal study can be sealed")
     _require(study.get("heldout_evaluated") is False and not study.get("stop_reason"), "study is incomplete or already tested")
     _require(study.get("core_source_hashes") == protocol["source_hashes"], "study source differs from protocol")
-    validate_runtime(protocol, study["arguments"], {**study["api_config"], "enabled": True})
+    handshake = protocol["plan"].get("provider") == "handshake"
+    if handshake:
+        validate_runtime(protocol, study["arguments"], study.get("provider_config"))
+    else:
+        validate_runtime(protocol, study["arguments"], {**study["api_config"], "enabled": True})
     for field, role in (("search_hash", "search"), ("validation_hash", "validation"), ("probe_hash", "probes")):
         _require(study.get(field) == protocol["data_hashes"][role], "study data hash differs: " + field)
     plan = protocol["plan"]
@@ -299,7 +357,8 @@ def _inspect_study(protocol, study_dir):
                                "screening_enabled": arm in "CD",
                                "collision_policy": plan["collision_policy"] if arm in "CD" else "off"}
             _require(record.get("method") == expected_method, "run method versions differ from protocol")
-            _require(record.get("config") == config and record.get("provider_class") == "ApiProvider"
+            _require(record.get("config") == config
+                     and record.get("provider_class") == ("HandshakeProvider" if handshake else "ApiProvider")
                      and record.get("heldout_evaluated") is False, "run configuration/provider differs from protocol")
             _require(record.get("evidence_scope") == "formal_comparison", "run is not formal LLM evidence")
             _require(all(record.get("source_hashes", {}).get(k) == v for k, v in module_hashes.items()),
@@ -308,8 +367,14 @@ def _inspect_study(protocol, study_dir):
             _require(record.get("search_hash") == protocol["data_hashes"]["search"], "run search hash mismatch")
         _require(info.get("termination") == entry.get("termination") == "request_budget_completed",
                  "incomplete search cannot enter final testing")
-        for metric in ("generator_requests", "requests_attempted", "paid_api_requests"):
+        for metric in ("generator_requests", "requests_attempted"):
             _require(info["metrics"].get(metric) == plan["calls_per_run"], "formal request count mismatch")
+        if handshake:
+            _require(info["metrics"].get("paid_api_requests") == 0,
+                     "handshake runs must not record paid requests")
+        else:
+            _require(info["metrics"].get("paid_api_requests") == plan["calls_per_run"],
+                     "formal request count mismatch")
         _require(entry.get("metrics") == info["metrics"], "study and run metrics disagree")
         events = _jsonl(directory / "events.jsonl")
         responses = _jsonl(directory / "provider_responses.jsonl")
@@ -325,10 +390,16 @@ def _inspect_study(protocol, study_dir):
             response = saved.get("response", {})
             _require(event.get("response") == response and event.get("messages") == saved.get("messages")
                      and bool(event.get("messages")), "prompt/response logs disagree")
-            _require(response.get("offline_fixture") is False and response.get("paid_api_request") is True
-                     and response.get("request_attempted") is True and "model" in response
-                     and response.get("requested_model") == protocol["api_config"]["model"],
-                     "fixture, unsent, or incorrectly identified model response")
+            if handshake:
+                _require(response.get("offline_fixture") is False and response.get("paid_api_request") is False
+                         and response.get("request_attempted") is True and "model" in response
+                         and response.get("requested_model") == protocol["provider_config"]["model"],
+                         "fixture, unsent, or incorrectly identified model response")
+            else:
+                _require(response.get("offline_fixture") is False and response.get("paid_api_request") is True
+                         and response.get("request_attempted") is True and "model" in response
+                         and response.get("requested_model") == protocol["api_config"]["model"],
+                         "fixture, unsent, or incorrectly identified model response")
         measured = _jsonl(directory / "evaluated.jsonl")
         _require(bool(measured) and all(digest(r["code"]) == r["code_hash"] for r in measured),
                  "invalid measured candidate evidence")
