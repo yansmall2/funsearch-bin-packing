@@ -355,7 +355,9 @@ def _inspect_study(protocol, study_dir):
             expected_method = {"prompt_version": prompt_version("enhanced" if arm in "BD" else "basic", plan["enhanced_prompt_version"]),
                                "enhanced_prompt_version": plan["enhanced_prompt_version"],
                                "screening_enabled": arm in "CD",
-                               "collision_policy": plan["collision_policy"] if arm in "CD" else "off"}
+                               "collision_policy": plan["collision_policy"] if arm in "CD" else "off",
+                               "search_context": ("mechanism_v4_memory_v1"
+                                                  if plan["enhanced_prompt_version"] == "mechanism_v4" else "off")}
             _require(record.get("method") == expected_method, "run method versions differ from protocol")
             _require(record.get("config") == config
                      and record.get("provider_class") == ("HandshakeProvider" if handshake else "ApiProvider")

@@ -4,7 +4,7 @@ import json
 
 from .programs import language_prompt
 
-ENHANCED_VERSIONS = ("enhanced_v1", "mechanism_v3")
+ENHANCED_VERSIONS = ("enhanced_v1", "mechanism_v3", "mechanism_v4")
 
 
 def prompt_version(mode, enhanced_version="enhanced_v1"):
@@ -13,15 +13,23 @@ def prompt_version(mode, enhanced_version="enhanced_v1"):
     return "basic_v1" if mode == "basic" else enhanced_version
 
 
-def build_messages(mode, parents, *, enhanced_version="enhanced_v1"):
+def build_messages(mode, parents, *, enhanced_version="enhanced_v1", search_context=None):
     """Build the basic/enhanced prompt with an intentionally narrow parent schema.
 
     Unknown parent keys (test results, probe signatures, audit outcomes, etc.)
     are never serialized. Enhanced adds a brief strategy description, not an
     additional LLM call or a request for private step-by-step reasoning.
+
+    mechanism_v4 is mechanism_v3 plus a compact search-memory block
+    (see funpack.search_context): family summaries with a hard word budget,
+    never raw candidate history. v4 requires search_context; passing it with
+    any other version is a misuse error. The v3 text is byte-identical
+    with or without this parameter.
     """
     # Keep the legacy default for historical callers. New experiment plans pin v3.
     prompt_version(mode, enhanced_version)
+    if search_context is not None and enhanced_version != "mechanism_v4":
+        raise ValueError("search_context is only supported by mechanism_v4")
     clean_parents = []
     for parent in parents:
         code = parent.get("code")
@@ -47,7 +55,7 @@ def build_messages(mode, parents, *, enhanced_version="enhanced_v1"):
         + json.dumps(clean_parents, ensure_ascii=False, allow_nan=False)
         + "\n\n"
     )
-    if mode == "enhanced" and enhanced_version == "mechanism_v3":
+    if mode == "enhanced" and enhanced_version in ("mechanism_v3", "mechanism_v4"):
         user = (
             "The following programs and measured search-set bin counts are reference "
             "strategies. Lower counts are better. Design one candidate with a coherent "
@@ -75,6 +83,11 @@ def build_messages(mode, parents, *, enhanced_version="enhanced_v1"):
             "the permitted language. Local execution will measure behavior and packing "
             "quality independently of your description."
         )
+        if enhanced_version == "mechanism_v4":
+            if search_context is None:
+                raise ValueError("mechanism_v4 requires search_context")
+            marker = "Choose one mechanism to explore:"
+            user = user.replace(marker, search_context + "\n\n" + marker, 1)
     elif mode == "enhanced":
         user += (
             "Start with 'Strategy:' and at most 80 English words describing "

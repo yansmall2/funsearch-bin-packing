@@ -1,0 +1,1 @@
+{"text": "Strategy: Pure worst fit: score each bin by its residual alone, so the item always goes to the roomiest bin, spreading items evenly and keeping tight bins free for large items that fit nowhere else. It can fail when spreading fragments every bin into pieces too small for later items.\n\n```python\ndef priority(item, bins):\n    return [r for r in bins]\n```\n"}

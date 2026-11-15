@@ -11,6 +11,7 @@ from .programs import BF_CODE, FF_CODE, CODE_LANGUAGE_VERSION, Program, extract_
 from .prompts import build_messages, prompt_version
 from .providers import BudgetExceeded
 from .screening import BehavioralScreen, COLLISION_POLICIES
+from .search_context import SearchContext
 from .storage import append_jsonl, digest, environment, source_hashes, write_json
 
 ARMS = {"A": ("basic", False), "B": ("enhanced", False),
@@ -38,12 +39,17 @@ def run_search(instances, probes, provider, config, out_dir):
     rng_audit = random.Random(seed + 1_000_003)
     db = Database(seed, config.get("islands", 4), config.get("temperature", 1.0))
     screen = BehavioralScreen(probes, collision_policy=collision_policy) if screening else None
+    # Compact per-run search memory (family summaries only). Only active for
+    # mechanism_v4; it observes this run's own search-set results and nothing
+    # else -- no validation, held-out, or cross-run data ever enters.
+    search_ctx = SearchContext() if enhanced_version == "mechanism_v4" else None
     source_snapshot = source_hashes(Path(__file__).parent)
     context = digest({"search_data": instances, "language": CODE_LANGUAGE_VERSION,
                       "evaluator": EVALUATOR_VERSION, "source_hashes": source_snapshot,
                       "evaluation_timeout_seconds": config.get("evaluation_timeout_seconds", 30)})
     method = {"prompt_version": version, "enhanced_prompt_version": enhanced_version,
-              "screening_enabled": screening, "collision_policy": collision_policy if screening else "off"}
+              "screening_enabled": screening, "collision_policy": collision_policy if screening else "off",
+              "search_context": "mechanism_v4_memory_v1" if enhanced_version == "mechanism_v4" else "off"}
     provenance = {"config": config, "method": method, "environment": environment(), "search_context_hash": context,
                   "search_hash": digest(instances),
                   "probe_hash": digest(probes), "source_hashes": source_snapshot,
@@ -66,6 +72,7 @@ def run_search(instances, probes, provider, config, out_dir):
                "seed_full_evaluations": 0, "candidate_full_evaluations": 0,
                "successful_candidate_evaluations": 0, "invalid_candidates": 0,
                "generation_seconds": 0.0, "screening_seconds": 0.0, "evaluation_seconds": 0.0,
+               "search_context_max_words": 0,
                "input_tokens_reported": 0, "output_tokens_reported": 0,
                "input_tokens_unknown_requests": 0, "output_tokens_unknown_requests": 0,
                "estimated_cost_reported": 0.0, "unknown_cost_requests": 0}
@@ -94,6 +101,8 @@ def run_search(instances, probes, provider, config, out_dir):
         metrics["seed_full_evaluations"] += 1
         record = full_record(code, program, name)
         db.add(record)
+        if search_ctx is not None:
+            search_ctx.observe(code, record["mean_bins"])
         if screen:
             started = time.perf_counter()
             screen.register(program, record)
@@ -102,10 +111,15 @@ def run_search(instances, probes, provider, config, out_dir):
     termination = "request_budget_completed"
     for request_index in range(1, calls + 1):
         island, parents = db.parents()
-        messages = build_messages(mode, parents, enhanced_version=enhanced_version)
+        rendered_context = search_ctx.render() if search_ctx is not None else None
+        messages = build_messages(mode, parents, enhanced_version=enhanced_version,
+                                  search_context=rendered_context)
+        context_words = len(rendered_context.split()) if rendered_context else 0
+        metrics["search_context_max_words"] = max(metrics["search_context_max_words"], context_words)
         event = {"request_index": request_index, "arm": arm, "island": island,
                  "parents": [p["id"] for p in parents], "messages": messages,
-                 "messages_hash": digest(messages), "method": method}
+                 "messages_hash": digest(messages), "method": method,
+                 "search_context_words": context_words}
         # A pending record survives interruption without silently losing an attempted request.
         write_json(out_dir / "pending_request.json", event)
         started = time.perf_counter()
@@ -209,6 +223,10 @@ def run_search(instances, probes, provider, config, out_dir):
                             metrics["valid_on_probes_or_search"] += 1
                             metrics["successful_candidate_evaluations"] += 1
                             db.add(record, island)
+                            # Only newly measured candidates enter the memory.
+                            # Cache hits and behavior skips add no new evidence.
+                            if search_ctx is not None:
+                                search_ctx.observe(code, record["mean_bins"])
                             event.update(status="audit_evaluated" if audit else "evaluated",
                                          result={k: v for k, v in record.items() if k != "code"})
                             if audit:
@@ -254,8 +272,11 @@ def run_search(instances, probes, provider, config, out_dir):
     best = sorted(records, key=lambda r: (r["mean_bins"], len(r["code"]), r["code_hash"]))[:5]
     metrics["search_total_seconds"] = time.perf_counter() - timer
     metrics["full_evaluations_including_seeds"] = metrics["seed_full_evaluations"] + metrics["candidate_full_evaluations"]
+    if search_ctx is not None:
+        write_json(out_dir / "search_context.json", search_ctx.to_dict())
     summary = {**provenance, "termination": termination, "metrics": metrics,
                "top_search_candidates": best, "best_search_mean_bins": best[0]["mean_bins"],
+               "search_context": search_ctx.to_dict() if search_ctx is not None else None,
                "not_a_test_result": True}
     write_json(out_dir / "final_info.json", summary)
     return summary

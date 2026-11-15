@@ -1,0 +1,66 @@
+{
+  "max_words": 120,
+  "total": 25,
+  "families": {
+    "count_gate": {
+      "tries": 1,
+      "best": 290.1
+    },
+    "count_gate+dist": {
+      "tries": 1,
+      "best": 270.93333333333334
+    },
+    "count_gate+dist+triangular": {
+      "tries": 2,
+      "best": 277.06666666666666
+    },
+    "count_gate+mod+worst_fit": {
+      "tries": 1,
+      "best": 287.5
+    },
+    "count_gate+worst_fit": {
+      "tries": 1,
+      "best": 298.8333333333333
+    },
+    "dist+triangular": {
+      "tries": 2,
+      "best": 266.26666666666665
+    },
+    "dist+worst_fit": {
+      "tries": 2,
+      "best": 265.3
+    },
+    "mod": {
+      "tries": 2,
+      "best": 265.8333333333333
+    },
+    "mod+triangular+worst_fit": {
+      "tries": 1,
+      "best": 292.26666666666665
+    },
+    "mod+worst_fit": {
+      "tries": 1,
+      "best": 287.26666666666665
+    },
+    "plain": {
+      "tries": 4,
+      "best": 265.3
+    },
+    "ratio": {
+      "tries": 1,
+      "best": 266.43333333333334
+    },
+    "ratio+scaled": {
+      "tries": 2,
+      "best": 271.46666666666664
+    },
+    "triangular": {
+      "tries": 3,
+      "best": 301.23333333333335
+    },
+    "worst_fit": {
+      "tries": 1,
+      "best": 303.06666666666666
+    }
+  }
+}
