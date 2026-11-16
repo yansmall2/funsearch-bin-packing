@@ -1,0 +1,215 @@
+{
+  "selection_rule": "search top5; validation mean; search mean; code length; hash",
+  "validation_hash": "394b41525697c8601d3b24ceb07fb6d495f0942865ee1097ce869fc56e15bc9e",
+  "candidates": [
+    {
+      "id": "candidate_000005",
+      "code": "def priority(item, bins):\n    return [-(r - item) / item - 1.0 * abs((r - item) / item - round((r - item) / item)) + 0.5 * ((r - item) // item) / ((r - item) // item + 1) for r in bins]\n",
+      "code_hash": "ec5cd64365d782bf02b8c2d85dd62247190d9102dcecf0f03f6347a13dfa78e8",
+      "search_mean_bins": 265.1666666666667,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "0e1c7087da4e6a32ce3950f773e48ae50ae0e99251e46063191b1b27e8d9e616",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "2041e8adc29b9b9d068ec4cc6d5f09c05701a01c547d2692f143bcc748612932",
+          "65943a2e3e26eba2026a6ff302b9dd36033a17a3056769a00c01c21a5ed6ac01",
+          "147ace34d103c4c0ab7b397385eb66a555289fb5744d2d844704ac244e899827",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "010c55d33805aa288bb98c5b0363ed90b4155578aed73a1792eea2879b207f62",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000001",
+      "code": "def priority(item, bins):\n    return [-(r - item) + (0.5 * item if item <= r - item < 2 * item else 0.0) for r in bins]\n",
+      "code_hash": "1b4e25e547d02df7c24ba25dea1414e8939c52e37e73829daf9aa65adea544d8",
+      "search_mean_bins": 265.2,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "0e1c7087da4e6a32ce3950f773e48ae50ae0e99251e46063191b1b27e8d9e616",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "9dffba9abe6e09ba9cd62aaec11c0fd8518a423f0389ae4b040deff6117d2bef",
+          "65943a2e3e26eba2026a6ff302b9dd36033a17a3056769a00c01c21a5ed6ac01",
+          "3259a6f96dc5b8aa1c63dab87f38f6a681234823e002bf20df736cf61db9a266",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "010c55d33805aa288bb98c5b0363ed90b4155578aed73a1792eea2879b207f62",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000024",
+      "code": "def priority(item, bins):\n    return [-(r - item) / item - 0.5 * abs((r - item) / item - 1.5) + 0.5 * ((r - item) // item) / ((r - item) // item + 1) for r in bins]\n",
+      "code_hash": "502c4223989687f5b39487a42870432236873cf65b0aff4aae23d63918426200",
+      "search_mean_bins": 265.2,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "0e1c7087da4e6a32ce3950f773e48ae50ae0e99251e46063191b1b27e8d9e616",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "9dffba9abe6e09ba9cd62aaec11c0fd8518a423f0389ae4b040deff6117d2bef",
+          "65943a2e3e26eba2026a6ff302b9dd36033a17a3056769a00c01c21a5ed6ac01",
+          "3259a6f96dc5b8aa1c63dab87f38f6a681234823e002bf20df736cf61db9a266",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "010c55d33805aa288bb98c5b0363ed90b4155578aed73a1792eea2879b207f62",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000023",
+      "code": "def priority(item, bins):\n    return [-(r - item) / item - 1.0 * abs((r - item) / item - round((r - item) / item)) for r in bins]\n",
+      "code_hash": "48d217a0ae5ab7dcc78ffdb55bf77093668b9cca36e66ab77736b9d055a11c49",
+      "search_mean_bins": 265.23333333333335,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          258
+        ],
+        "mean_bins": 267.7,
+        "trace_hashes": [
+          "1dec6712a1cc3fbb48eb6e837ff6fb20373d7ce2878eef953434cb9248c1c778",
+          "5910879526f55e34d650d1d0cbcdc719fb025e1319c68b40d1173efd1ee0ee8b",
+          "0e1c7087da4e6a32ce3950f773e48ae50ae0e99251e46063191b1b27e8d9e616",
+          "b249174e7fa05e5daedd10c96ce3c745ec6b9c0cdd8d876e6f267bf99f45c308",
+          "9dffba9abe6e09ba9cd62aaec11c0fd8518a423f0389ae4b040deff6117d2bef",
+          "65943a2e3e26eba2026a6ff302b9dd36033a17a3056769a00c01c21a5ed6ac01",
+          "baccdefb2480279eaa978854ce6fb1cc3d04306079467f9091b2f0e8a21f478b",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "010c55d33805aa288bb98c5b0363ed90b4155578aed73a1792eea2879b207f62",
+          "d9a87a63cae509e0157f2ad1a5e5ce31aa45a5246fb1adbe2a5e66a3061e7ac8"
+        ]
+      },
+      "status": "valid"
+    },
+    {
+      "id": "candidate_000029",
+      "code": "def priority(item, bins):\n    return [-(r - item) / item - 0.5 * abs((r - item) / item - 1) - 1.0 * abs((r - item) / item - round((r - item) / item)) for r in bins]\n",
+      "code_hash": "c5c8d2e5c584d26e8e763de7cc8b38859fca47f7d1f43356e069da8284724f71",
+      "search_mean_bins": 265.23333333333335,
+      "validation": {
+        "counts": [
+          275,
+          286,
+          265,
+          265,
+          272,
+          263,
+          264,
+          265,
+          264,
+          257
+        ],
+        "mean_bins": 267.6,
+        "trace_hashes": [
+          "ea41faae93b4588cf11752141c2a742e3b2a10d7ccf0a544d9610e690a9787b5",
+          "4b7865c806a3dd8befee2d14c2221fdb9da4c87320c8b74e777749f3213e9eb8",
+          "5d4822d0c1177c094547a39eb9f4c72bd5a78213db4159e26d1641bf6952a251",
+          "d21d2b7f0e2dc22ecb655de71cb6ba1eeb76dc4ae9196256d541c437a9bde6f3",
+          "9d8b231fb47541f4fabc39e9faee8288ca908a189985cf35be4b5de7e7d95244",
+          "d4dbc61f4b40f5979d4e20d674a11c77bda07ac35405d9375ed4888a40112c67",
+          "05600c51beb3a1473b1b35d5a873cf479a48508415726849f07c27ab9c826b9a",
+          "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+          "17c8df5ebb3d043b39f71816f4ca3c884e1e03864ffd2e5f220cd1d9cf6d830b",
+          "090c5b052b1807e47fa520f8092c3d56016291d5833f896c09bdad13ac3ec3dd"
+        ]
+      },
+      "status": "valid"
+    }
+  ],
+  "selected": {
+    "id": "candidate_000029",
+    "code": "def priority(item, bins):\n    return [-(r - item) / item - 0.5 * abs((r - item) / item - 1) - 1.0 * abs((r - item) / item - round((r - item) / item)) for r in bins]\n",
+    "code_hash": "c5c8d2e5c584d26e8e763de7cc8b38859fca47f7d1f43356e069da8284724f71",
+    "search_mean_bins": 265.23333333333335,
+    "validation": {
+      "counts": [
+        275,
+        286,
+        265,
+        265,
+        272,
+        263,
+        264,
+        265,
+        264,
+        257
+      ],
+      "mean_bins": 267.6,
+      "trace_hashes": [
+        "ea41faae93b4588cf11752141c2a742e3b2a10d7ccf0a544d9610e690a9787b5",
+        "4b7865c806a3dd8befee2d14c2221fdb9da4c87320c8b74e777749f3213e9eb8",
+        "5d4822d0c1177c094547a39eb9f4c72bd5a78213db4159e26d1641bf6952a251",
+        "d21d2b7f0e2dc22ecb655de71cb6ba1eeb76dc4ae9196256d541c437a9bde6f3",
+        "9d8b231fb47541f4fabc39e9faee8288ca908a189985cf35be4b5de7e7d95244",
+        "d4dbc61f4b40f5979d4e20d674a11c77bda07ac35405d9375ed4888a40112c67",
+        "05600c51beb3a1473b1b35d5a873cf479a48508415726849f07c27ab9c826b9a",
+        "903dd58635ae6ef4a7157714b7a773923fb15cbe42d39f668b5f49174092b1c1",
+        "17c8df5ebb3d043b39f71816f4ca3c884e1e03864ffd2e5f220cd1d9cf6d830b",
+        "090c5b052b1807e47fa520f8092c3d56016291d5833f896c09bdad13ac3ec3dd"
+      ]
+    },
+    "status": "valid"
+  },
+  "used_seed_fallback": false,
+  "heldout_evaluated": false,
+  "evidence_scope": "llm_pilot_unless_frozen",
+  "timeout_seconds": 30,
+  "seconds": 2.709173388999943
+}

@@ -1,0 +1,1 @@
+{"text":"```python\ndef priority(item, bins):\n    return [-(r - item) / item + 0.5 * ((r - item) // item) * (item / (item + sum(bins) / len(bins))) - (1.0 if r == max(bins) else 0.0) for r in bins]\n```"}

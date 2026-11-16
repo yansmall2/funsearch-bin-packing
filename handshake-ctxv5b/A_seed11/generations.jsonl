@@ -1,0 +1,28 @@
+{"request_index": 1, "mechanism": "BF + penalty 10 when leftover after placement in (item/3, item]", "family": "plain-refine/residual-window-penalty"}
+{"request_index": 2, "mechanism": "scaled BF -(r-item)/item + 0.75 bonus when leftover >= item (usable for another item)", "family": "ratio+scaled-refine"}
+{"request_index": 3, "mechanism": "scaled BF -(r-item)/item + 0.5 rebate per whole extra item that fits ((r-item)//item)", "family": "ratio+scaled-refine/staircase-rebate"}
+{"request_index": 4, "mechanism": "staircase rebate 0.5/floor(q) + window penalty 0.5 when leftover in (item/3, item]", "family": "ratio+scaled-refine/staircase+window"}
+{"request_index": 5, "mechanism": "scaled BF -(r-item)/item + 0.5 spike when leftover is an exact multiple of item ((r-item) % item == 0)", "family": "ratio+scaled-refine/mod-tiling"}
+{"request_index": 6, "mechanism": "scaled BF -q - 0.5 * remainder/item, penalize unusable remainder after fitting whole items", "family": "ratio+scaled-refine/remainder-penalty"}
+{"request_index": 7, "mechanism": "scaled BF -q + 1.5/(1+|q-1|) rational bump peaking at leftover == item", "family": "ratio+scaled-refine/dist-bump"}
+{"request_index": 8, "mechanism": "staircase rebate 0.25/floor(q) + rational bump 1.0/(1+|q-1|) on scaled BF", "family": "ratio+scaled-refine/staircase+bump"}
+{"request_index": 9, "mechanism": "staircase rebate 0.5/floor(q) modulated by item/(item+mean residual) global adaptivity", "family": "ratio+scaled-refine/adaptive-rebate"}
+{"request_index": 10, "mechanism": "staircase rebate 0.5/floor(q) minus 1.0 if bin is the loosest (reserve most flexible bin)", "family": "ratio+scaled-refine/staircase+reserve-max"}
+{"request_index": 11, "mechanism": "scaled BF -q + 0.25 rebate per half-item that fits (floor(2q) staircase)", "family": "ratio+scaled-refine/half-staircase"}
+{"request_index": 12, "mechanism": "scaled BF -q + 0.5*sqrt(floor(q)) diminishing-returns staircase rebate", "family": "ratio+scaled-refine/sqrt-rebate"}
+{"request_index": 13, "mechanism": "scaled BF penalty discounted by 1/(1+0.1*floor(q)) bulk discount on leftover penalty", "family": "ratio+scaled-refine/discounted-penalty"}
+{"request_index": 14, "mechanism": "staircase rebate 0.5/floor(q) modulated by len(bins)/(len(bins)+5) count adaptivity", "family": "ratio+scaled-refine/count-adaptive-rebate"}
+{"request_index": 15, "mechanism": "remainder penalty -0.5*u + 0.25 gate bonus when leftover >= item", "family": "ratio+scaled-refine/remainder+gate"}
+{"request_index": 16, "mechanism": "discounted penalty -q/(1+0.1*floor(q)) + 0.5 spike at exact multiples of item", "family": "ratio+scaled-refine/discount+mod-spike"}
+{"request_index": 17, "mechanism": "sqrt staircase rebate 0.5*sqrt(floor(q)) minus 1.0 if bin is the loosest (reserve most flexible bin); no modulo", "family": "ratio+scaled-refine/sqrt-rebate+reserve-max"}
+{"request_index": 18, "mechanism": "discounted penalty -q/(1+0.1*floor(q)) minus 0.5 window penalty when leftover in (item/3, item]; no modulo", "family": "ratio+scaled-refine/discount+window"}
+{"request_index": 19, "mechanism": "staircase rebate 0.5/min(floor(q),3) capped at 3 whole items; no modulo", "family": "ratio+scaled-refine/capped-rebate"}
+{"request_index": 20, "mechanism": "capped staircase rebate 0.5*min(floor(q),3) minus 1.0 if bin is the loosest; no modulo, no dist bump", "family": "ratio+scaled-refine/capped-rebate+reserve-max"}
+{"request_index": 21, "mechanism": "convex staircase rebate 0.1*min(floor(q)^2,20) increasing returns per whole item; no modulo, no dist bump", "family": "ratio+scaled-refine/convex-rebate"}
+{"request_index": 22, "mechanism": "staircase rebate 0.5/floor(q) + 0.25 gate bonus when leftover >= item; no modulo, no dist bump", "family": "ratio+scaled-refine/staircase+gate"}
+{"request_index": 23, "mechanism": "discounted penalty -q/(1+0.1*floor(q)) + 0.25 gate bonus when leftover >= item; no modulo, no dist bump", "family": "ratio+scaled-refine/discount+gate"}
+{"request_index": 24, "mechanism": "two-rate staircase rebate 0.5/floor(q) for q<3, then 0.25/floor(q) beyond (rate kink at q=3); no modulo, no dist bump", "family": "ratio+scaled-refine/two-rate-rebate"}
+{"request_index": 25, "mechanism": "convex rebate 0.1*min(floor(q)^2,20) minus 1.0 if bin is the loosest; no modulo, no dist bump", "family": "ratio+scaled-refine/convex-rebate+reserve-max"}
+{"request_index": 26, "mechanism": "mean-adaptive staircase rebate 0.5*floor(q)*item/(item+mean residual) minus 1.0 if bin is the loosest; no modulo, no dist bump", "family": "ratio+scaled-refine/adaptive-rebate+reserve-max"}
+{"request_index": 27, "mechanism": "penalty 0.5*q + sqrt(q) with linear staircase rebate 0.5/floor(q) (sqrt moved from rebate to penalty); no modulo, no dist bump", "family": "ratio+scaled-refine/sqrt-penalty+rebate"}
+{"request_index": 28, "mechanism": "discounted penalty -q/(1+0.1*floor(q)*count-modulator) adaptive bulk discount; no modulo, no dist bump", "family": "ratio+scaled-refine/adaptive-discount"}

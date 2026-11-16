@@ -1,0 +1,39 @@
+{
+  "max_words": 120,
+  "memory_version": "v2",
+  "total": 25,
+  "families": {
+    "count_gate+worst_fit": {
+      "tries": 1,
+      "best": 267.3333333333333
+    },
+    "dist+triangular": {
+      "tries": 1,
+      "best": 273.6666666666667
+    },
+    "dist+worst_fit": {
+      "tries": 2,
+      "best": 277.0
+    },
+    "mod": {
+      "tries": 2,
+      "best": 266.06666666666666
+    },
+    "plain": {
+      "tries": 12,
+      "best": 265.1333333333333
+    },
+    "ratio": {
+      "tries": 3,
+      "best": 265.1666666666667
+    },
+    "scaled+triangular": {
+      "tries": 1,
+      "best": 291.1333333333333
+    },
+    "triangular": {
+      "tries": 3,
+      "best": 271.3666666666667
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "max_words": 120,
+  "memory_version": "v2",
+  "total": 34,
+  "families": {
+    "dist+mod+scaled": {
+      "tries": 1,
+      "best": 265.3666666666667
+    },
+    "dist+scaled+triangular": {
+      "tries": 3,
+      "best": 265.26666666666665
+    },
+    "plain": {
+      "tries": 2,
+      "best": 265.3
+    },
+    "ratio": {
+      "tries": 1,
+      "best": 265.2
+    },
+    "scaled": {
+      "tries": 3,
+      "best": 265.26666666666665
+    },
+    "scaled+triangular": {
+      "tries": 24,
+      "best": 265.1666666666667
+    }
+  }
+}
