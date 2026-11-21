@@ -1,8 +1,0 @@
-{
-  "stage": "thinking200_failed_ssl_zero_candidates",
-  "formal_start_allowed": false,
-  "reason": "All200 attempted requests failed with SSL UNEXPECTED_EOF_WHILE_READING; zero successful candidate responses. Best265.3 is the BF seed only. CNY55.4464 is retained unknown-cost reservation, not confirmed spending. Raw claim/logs are preserved; stop-on-first-provider-error is patched. Resolve transport and account for unknown fees before any separately recorded rerun; formal study remains disabled.",
-  "authorized_pilot": {"requests_per_arm": 50, "total_requests": 200, "thinking": "enabled", "reasoning_effort": "high", "seed": 11},
-  "updated_date": "2026-11-09",
-  "automatic_unlock": false
-}
