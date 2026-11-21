@@ -102,6 +102,13 @@ def study(budget, all_search):
     print(f"{len(rows)*budget} reconstructed prompts matched their original message hashes; 12 selections verified.")
     print("Wall seconds",round(data["wall_seconds"],2),"token cost estimate CNY",round(sum(r["metrics"]["estimated_cost_reported"] for r in data["runs"]),6))
     if budget==200:
+        print("\nWithin each 200-step run, compare its own step-60 prefix with step 200.")
+        print("Run       Search at 60  Search at 200  Validation at 60  Validation at 200")
+        for row in rows:
+            prefix_search, prefix_validation, _ = row["prefix"]
+            run = f"{row['arm']}_{row['seed']}"
+            print(f"{run:<9}{prefix_search:>13.3f}{row['search']:>15.3f}"
+                  f"{prefix_validation:>18.3f}{row['validation']:>19.3f}")
         print("Same-run improvements after step 60: search",sum(r["search"]<r["prefix"][0] for r in rows),
               "validation",sum(r["validation"]<r["prefix"][1] for r in rows),"of 12")
         probes=load_probes(ROOT/"data/probes.json");bf=fingerprint(Program(BF_CODE),probes)

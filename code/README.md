@@ -6,13 +6,15 @@ Run these commands from `code/`. The reference environment was Windows 11 and CP
 
 | Command | Expected result | Typical time |
 | --- | --- | --- |
-| `python -B results.py --budget 60` | Rebuild 720 prompts, check the random audits, repack the shortlist and verify each of the 12 validation winners. All tie BF at 267.7. | Under 2 min |
-| `python -B results.py --budget 200` | Rebuild 2,400 prompts and 12 selections. On these same trajectories, search improves after step 60 in 9/12 runs and validation improves in 1/12. | Under 2 min |
+| `python -B results.py --budget 60` | Verify the independently started 60-step study. Rebuild 720 prompts and all 12 validation winners. All tie BF at 267.7. | Under 2 min |
+| `python -B results.py --budget 200` | Rebuild 2,400 prompts and all 12 validation winners. A second table compares step 60 and step 200 within each long run. | Under 2 min |
 | `python -B results.py --final60` | Print the previously recorded synthetic test and OR3 counts for every sealed 60-step winner. | Seconds |
 | `python -B results.py --history` | Re-score two pilot candidates against BF, then print the earlier fixed-stream filter comparison (402 vs 460 full evaluation attempts). | Seconds |
 | `python -B -m unittest discover -s tests -q` | Exercise the simulator, screening, prompt, protocol and multi-process ledger checks. One optional test skips if the upstream notebook is absent. | About 10 s |
 
-Omit `--budget` to verify both studies. Add `--all-search` to recompute every measured candidate's sequence counts and action-trace digest. Without that switch, all shortlisted search results and all validation selections are recomputed. The four executable programs that coordinate the pipeline are `experiment.py`, `formal.py`, `audit_and_cost.py` and `results.py`.
+Each step is a request to propose one candidate rule. Both budgets cover four groups and three seeds. The 200-step prefix comparison reuses the first 60 requests from each long run and repeats validation selection using the candidates available then. In that comparison, search improves in 9 of 12 runs and validation improves in 1 of 12.
+
+Omit `--budget` to verify both studies. Add `--all-search` to recompute every measured candidate's sequence counts and action-trace digest. The default rechecks shortlisted search results, audited matches and all validation selections.
 
 ## What the public evidence contains
 
