@@ -19,7 +19,7 @@ Each study had four groups and three random seeds per group. One step is one Dee
 | 60 steps | 720 | All 12 selected programs tied Best Fit at 267.7 mean bins. | 8.3 min |
 | 200 steps | 2,400 | Two D runs reached 267.6. Each saved one bin on the same validation sequence. | 31.1 min |
 
-Within the longer runs, we compared the candidates available at step 60 with those available at step 200. Best search scores improved in 9 of 12 runs and validation improved in 1 of 12. The 60-step study also has results on the synthetic test set and OR3.
+The 60-step main comparison includes results on the synthetic test set and OR3. In the exploratory 200-step extension, we compared the candidates available at step 60 with those available at step 200. Best search scores improved in 9 of 12 runs and validation improved in 1 of 12.
 
 ## Reproduce the main comparison
 
