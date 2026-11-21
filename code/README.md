@@ -12,7 +12,7 @@ Run these commands from `code/`. The reference environment was Windows 11 and CP
 | `python -B results.py --history` | Re-score two pilot candidates against BF, then print the earlier fixed-stream filter comparison (402 vs 460 full evaluation attempts). | Seconds |
 | `python -B -m unittest discover -s tests -q` | Exercise the simulator, screening, prompt, protocol and multi-process ledger checks. One optional test skips if the upstream notebook is absent. | About 10 s |
 
-Each step is a request to propose one candidate rule. Both budgets cover four groups and three seeds. The 200-step prefix comparison reuses the first 60 requests from each long run and repeats validation selection using the candidates available then. In that comparison, search improves in 9 of 12 runs and validation improves in 1 of 12.
+Each step is a request to propose one candidate rule. The main comparison used 60 steps. The separately frozen 200-step extension is exploratory. Both cover four groups and three seeds. The 200-step prefix comparison reuses the first 60 requests from each long run and repeats validation selection using the candidates available then. In that comparison, search improves in 9 of 12 runs and validation improves in 1 of 12.
 
 Omit `--budget` to verify both studies. Add `--all-search` to recompute every measured candidate's sequence counts and action-trace digest. The default rechecks shortlisted search results, audited matches and all validation selections.
 
@@ -30,11 +30,31 @@ The [60-step records](evidence/search-60.json) and [200-step records](evidence/s
 
 The verifier rebuilds a prompt using its recorded parent functions, their measured counts and the frozen template. Its digest must equal the digest of the actual messages saved at generation. It recomputes random audits against the representative available at the time of the decision, and checks the selected winner's code hash. Programs that failed or were skipped before full evaluation are represented by status and provenance. Original unfiltered model responses and full prompt logs are kept in the local research record.
 
-Read the [60-step freeze](evidence/protocol-60.json), [200-step freeze](evidence/protocol-200.json) and [60-step final outcomes](evidence/final-60.json) for the model settings, data checksums, source checksums and selection seal. The 200-step extension stopped at validation. The earlier Muse study also evaluated the same benchmark data.
+Read the [60-step freeze](evidence/protocol-60.json), [200-step freeze](evidence/protocol-200.json) and [60-step final outcomes](evidence/final-60.json) for the model settings, data checksums, source checksums and selection seal. The nested `plan.status` records the input to the freeze. The outer `protocol_id` and `frozen_at_utc` identify the frozen record. The 200-step extension stopped at validation. The earlier Muse study also evaluated the same benchmark data.
 
 A/C use the basic prompt. B/D use the mechanism prompt. C/D screen after exact-source matching. New sources that match BF on all 128 probes are evaluated in full. A seeded 10% audit applies to other complete fingerprint matches. An off-probe trace or count disagreement disables that fingerprint for the rest of the run. Tied scores choose the earliest opened feasible bin. Each generation within a run depends on the previous search results.
 
 There were 3,120 formal responses and an estimated CNY 8.067984 in known token usage. Twelve additional requests with unknown usage retained CNY 0.278352 in reservations. The ledger therefore accounted for CNY 8.346336. The [60-step recovery](evidence/credential-recovery.json) and [200-step extension](evidence/extension-200.json) record the cumulative budget. For efficiency, per-run times include probe setup, screening, audits and validation. Four workers overlap. The separate study wall times were 495.4 and 1,868.2 seconds.
+
+## Offline comparison of probe counts
+
+The [probe-count results](evidence/probe-count-replay.json) compare three policies on the same 1,200 saved DeepSeek proposals from groups C and D in the 200-step extension. We retain the original proposal order and exact-source cache. Both screens use a 10% audit and the same rule protecting matches to Best Fit on the probes in use. The 32-probe screen uses the first 32 states of the published 128. The no-screen run fully scores all distinct valid programs on the search set. We use these scores to determine whether skipped proposals would have used fewer bins than their representatives.
+
+| Screen | Candidate evaluations attempted | Skipped proposals | Skips that beat their representatives | Runs with a worse best search result than no screen |
+| --- | ---: | ---: | ---: | ---: |
+| Off | 999 | 0 | 0 | 0 |
+| 32 probes | 899 | 113 | 17 | 1 of 6 |
+| 128 probes | 897 | 116 | 22 | 2 of 6 |
+
+Counts are by proposal event. C/202 missed a rule that would have saved one additional bin across the 30 search sequences with either screen. C/303 missed a one-bin gain with the 128-probe screen. Changing the probe count also changes which candidates the Best Fit guard protects and which fingerprints are audited or disabled.
+
+The replay holds proposals fixed. A live search can choose new parents after a screening change and generate different proposals. The recorded CPU times cover local evaluation, fingerprinting and audits in a single replay with the modes run in a fixed order. They do not estimate end-to-end API runtime. The shared probe construction time is listed separately.
+
+To repeat the comparison with the local original logs, point the script at the directory containing both sets of C and D runs. The replay checks that all 128-probe decisions reproduce the original logs.
+
+```sh
+python -B replay_probe_counts.py --study-dir /path/to/run_200 --workers 4 --out probe-count-replay-local.json
+```
 
 ## Optional historical replay
 
