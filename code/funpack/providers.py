@@ -335,6 +335,14 @@ class ApiProvider:
                 choice = raw["choices"][0]
                 text = choice["message"]["content"]
                 finish_reason = choice.get("finish_reason")
+                if self.config.get("extra_body", {}).get("thinking", {}).get("type") == "disabled":
+                    if choice["message"].get("reasoning_content") or (usage_data.get("completion_tokens_details") or {}).get("reasoning_tokens"):
+                        raise ValueError("provider returned reasoning despite the disabled setting")
+                    if not isinstance(raw.get("model"), str) or not raw["model"].strip():
+                        raise ValueError("provider omitted the returned model identifier")
+                    expected = self.config.get("expected_model_version")
+                    if expected and raw["model"] not in (self.config["model"], expected):
+                        raise ValueError("returned model identifier differs from the configured alias and version")
                 if not isinstance(text, str):
                     raise ValueError("message content must be text")
             except (KeyError, IndexError, TypeError, ValueError) as exc:

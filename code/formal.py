@@ -34,6 +34,7 @@ def main(argv=None):
     run.add_argument("--data", default="data")
     run.add_argument("--out_dir", required=True)
     run.add_argument("--allow-paid", action="store_true")
+    run.add_argument("--parallel-arms", action="store_true", help="One worker per independent condition")
     seal = commands.add_parser("seal", help="Lock all validation-selected candidates before final testing")
     seal.add_argument("--protocol", required=True)
     seal.add_argument("--study", required=True)
@@ -89,6 +90,7 @@ def main(argv=None):
             import experiment
             plan = protocol["plan"]
             experiment.main([
+                *(["--parallel-arms"] if args.parallel_arms else []),
                 "--stage", "all", "--provider", "api", "--allow-paid",
                 "--protocol", args.protocol, "--api-config", args.api_config,
                 "--data", args.data, "--out_dir", args.out_dir,

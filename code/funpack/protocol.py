@@ -24,7 +24,7 @@ from .providers import _contains_secret_field, preflight
 from .storage import digest, environment, read_json, write_json
 
 
-CORE_FILES = ("experiment.py", "formal.py") + tuple(
+CORE_FILES = ("experiment.py", "formal.py", "milestone.py") + tuple(
     "funpack/" + name + ".py" for name in (
         "__init__", "data", "database", "ledger", "packing", "programs", "prompts",
         "providers", "protocol", "screening", "search", "storage"))
@@ -210,6 +210,8 @@ def validate_runtime(protocol, args, api_config):
     for argument, field in mapping.items():
         _require(args.get(argument) == plan[field], "runtime setting differs from protocol: " + argument)
     _require(api_config.get("enabled") is True, "formal API configuration must be enabled")
+    if plan["collision_policy"] == "protect_bf_disable_on_mismatch_v2":
+        _require(args.get("parallel_arms") is True, "this protocol requires parallel arms")
     _require(public_api_config(api_config) == protocol["api_config"],
              "API configuration differs from frozen protocol")
 
