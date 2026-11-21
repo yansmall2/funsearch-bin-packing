@@ -6,6 +6,7 @@ complete enabled budget configuration, as well as an environment API key.
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
 from pathlib import Path
 
@@ -81,6 +82,34 @@ def select_validation(run_dir, validation, timeout_seconds=30):
     return selection
 
 
+
+def _execute_run(job, provider=None, *, api_config=None, stop_path=None):
+    """Run one independent adaptive search; return only the small summary to the parent."""
+    config, instances, probes, validation, out_dir, validation_limit = job
+    arm, seed = config["arm"], config["seed"]
+    name = f"{arm}_seed{seed}"
+    started = time.perf_counter()
+    try:
+        if provider is None:
+            provider = ApiProvider(api_config, allow_paid=True) if api_config else OfflineProvider(seed=seed)
+        directory = out_dir / name
+        if stop_path is None:
+            info = run_search(instances, probes, provider, config, directory)
+        else:
+            info = run_search(instances, probes, provider, config, directory, stop_requested=stop_path.exists)
+            if info["termination"] != "request_budget_completed":
+                stop_path.touch(exist_ok=True)
+        selection = select_validation(directory, validation, validation_limit)
+        return {"run": name, "arm": arm, "seed": seed,
+                "best_search_mean_bins": info["best_search_mean_bins"],
+                "selected_validation_mean_bins": selection["selected"]["validation"]["mean_bins"],
+                "metrics": info["metrics"], "termination": info["termination"],
+                "pipeline_seconds": time.perf_counter() - started}
+    except Exception:
+        if stop_path is not None:
+            stop_path.touch(exist_ok=True)
+        raise
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage", choices=["baselines", "search", "all"], default="all")
@@ -89,6 +118,7 @@ def main(argv=None):
     parser.add_argument("--provider", choices=["offline", "api"], default="offline")
     parser.add_argument("--api-config", default="configs/api.local.json")
     parser.add_argument("--allow-paid", action="store_true")
+    parser.add_argument("--parallel-arms", action="store_true", help="Run independent arms in four processes; each arm stays adaptive")
     parser.add_argument("--arms", nargs="+", choices=list(ARMS), default=list(ARMS))
     parser.add_argument("--seeds", nargs="+", type=int, default=[11, 22, 33])
     parser.add_argument("--calls", type=int, default=16)
@@ -182,56 +212,52 @@ def main(argv=None):
         for split, values in result["results"].items():
             print(f"{split}: FF={values['FF']['mean_bins']:.3f}, BF={values['BF']['mean_bins']:.3f} bins")
     if args.stage in ("search", "all"):
-        for seed_index, seed in enumerate(args.seeds):
-            # Rotate order across repetitions to reduce API-time/order confounding.
-            order = args.arms[seed_index % len(args.arms):] + args.arms[:seed_index % len(args.arms)]
-            for arm in order:
-                run_name = f"{arm}_seed{seed}"
-                config = {"arm": arm, "seed": seed, "calls": args.calls, "islands": args.islands,
-                          "reset_every": args.reset_every, "audit_rate": args.audit_rate,
-                          "temperature": args.database_temperature,
-                          "enhanced_prompt_version": args.enhanced_prompt_version,
-                          "collision_policy": args.collision_policy,
-                          "evaluation_timeout_seconds": args.evaluation_timeout_seconds}
-                if protocol:
-                    config["protocol_id"] = protocol["protocol_id"]
-                print(f"{run_name}: {args.provider}; {args.calls} candidate requests. "
-                      + ("Frozen formal search; not a final test." if protocol else
-                         ("Plumbing check, not LLM evidence." if api is None else "Pilot; not a final test.")), flush=True)
-                provider = api if api is not None else OfflineProvider(seed=seed)
-                started = time.perf_counter()
-                info = run_search(instances, probes, provider, config, out_dir / run_name)
-                selection = select_validation(out_dir / run_name, validation, args.validation_timeout_seconds)
-                pipeline_seconds = time.perf_counter() - started
-                entry = {"run": run_name, "arm": arm, "seed": seed,
-                         "best_search_mean_bins": info["best_search_mean_bins"],
-                         "selected_validation_mean_bins": selection["selected"]["validation"]["mean_bins"],
-                         "metrics": info["metrics"], "termination": info["termination"]}
-                expected_runs = len(args.arms) * len(args.seeds)
-                screened_runs = sum(ARMS[a][1] for a in args.arms) * len(args.seeds)
-                common_share = manifest["timing"]["common_setup_seconds"] / expected_runs
-                probe_share = (probe_construction_seconds / screened_runs if ARMS[arm][1] and screened_runs else 0)
-                entry["timing"] = {
-                    "pipeline_seconds": pipeline_seconds,
-                    "common_setup_share_seconds": common_share,
-                    "probe_construction_share_seconds": probe_share if timed_setup else None,
-                    "inclusive_search_seconds": pipeline_seconds + common_share + probe_share if timed_setup else None,
-                }
-                manifest["runs"].append(entry)
-                write_json(out_dir / "study.json", manifest)
-                with (out_dir / "notes.txt").open("a", encoding="utf-8") as stream:
-                    stream.write(f"{run_name}: phase={manifest['phase']}; {entry}\n")
-                print(f"  evaluated={info['metrics']['candidate_full_evaluations']}, "
-                      f"text hits={info['metrics']['text_cache_hits']}, "
-                      f"behavior skips={info['metrics']['behavior_skips']}; "
-                      f"API errors={info['metrics']['provider_errors']}; "
-                      f"best search={info['best_search_mean_bins']:.3f}", flush=True)
-                if info["termination"] != "request_budget_completed":
-                    manifest["stop_reason"] = info["termination"]
-                    manifest["timing"]["study_elapsed_seconds"] = time.perf_counter() - study_started
+        common_share = manifest["timing"]["common_setup_seconds"] / (len(args.arms) * len(args.seeds))
+        screened_runs = sum(ARMS[arm][1] for arm in args.arms) * len(args.seeds)
+        pool = ProcessPoolExecutor(max_workers=len(args.arms)) if args.parallel_arms else None
+        stop_path = out_dir / "STOP"
+        try:
+            for seed_index, seed in enumerate(args.seeds):
+                order = args.arms[seed_index % len(args.arms):] + args.arms[:seed_index % len(args.arms)]
+                jobs = []
+                for arm in order:
+                    config = {"arm": arm, "seed": seed, "calls": args.calls, "islands": args.islands,
+                              "reset_every": args.reset_every, "audit_rate": args.audit_rate,
+                              "temperature": args.database_temperature,
+                              "enhanced_prompt_version": args.enhanced_prompt_version,
+                              "collision_policy": args.collision_policy,
+                              "evaluation_timeout_seconds": args.evaluation_timeout_seconds}
+                    if protocol:
+                        config["protocol_id"] = protocol["protocol_id"]
+                    jobs.append((config, instances, probes, validation, out_dir, args.validation_timeout_seconds))
+                print(f"Seed {seed}: {'parallel' if pool else 'sequential'} {', '.join(order)}; "
+                      f"{args.calls} candidates per arm.", flush=True)
+                if pool:
+                    futures = [pool.submit(_execute_run, job, api_config=api_config, stop_path=stop_path) for job in jobs]
+                    completed = (future.result() for future in as_completed(futures))
+                else:
+                    completed = (_execute_run(job, provider=api) for job in jobs)
+                for entry in completed:
+                    probe_share = (probe_construction_seconds / screened_runs if ARMS[entry["arm"]][1] and screened_runs else 0)
+                    entry["timing"] = {"pipeline_seconds": entry.pop("pipeline_seconds"),
+                                       "common_setup_share_seconds": common_share,
+                                       "probe_construction_share_seconds": probe_share if timed_setup else None}
+                    entry["timing"]["inclusive_search_seconds"] = (
+                        entry["timing"]["pipeline_seconds"] + common_share + probe_share if timed_setup else None)
+                    manifest["runs"].append(entry)
+                    if entry["termination"] != "request_budget_completed":
+                        manifest.setdefault("stop_reason", entry["termination"])
                     write_json(out_dir / "study.json", manifest)
-                    print("Study stopped early. Incomplete runs cannot support a balanced four-arm comparison.")
-                    return
+                    print(f"{entry['run']}: {entry['termination']}; "
+                          f"best search={entry['best_search_mean_bins']:.3f}, "
+                          f"validation={entry['selected_validation_mean_bins']:.3f}", flush=True)
+                    if not pool and manifest.get("stop_reason"):
+                        break
+                if manifest.get("stop_reason"):
+                    break
+        finally:
+            if pool:
+                pool.shutdown(wait=True, cancel_futures=True)
     manifest["timing"]["study_elapsed_seconds"] = time.perf_counter() - study_started
     write_json(out_dir / "study.json", manifest)
     print(f"Saved: {out_dir.resolve()}; no held-out test evaluation performed.")

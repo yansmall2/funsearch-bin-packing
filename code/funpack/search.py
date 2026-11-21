@@ -18,7 +18,7 @@ ARMS = {"A": ("basic", False), "B": ("enhanced", False),
 EVALUATOR_VERSION = "feasible-opened-only_max-first_v1"
 
 
-def run_search(instances, probes, provider, config, out_dir):
+def run_search(instances, probes, provider, config, out_dir, *, stop_requested=None):
     arm = config["arm"]
     mode, screening = ARMS[arm]
     enhanced_version = config.get("enhanced_prompt_version", "enhanced_v1")
@@ -61,6 +61,8 @@ def run_search(instances, probes, provider, config, out_dir):
                "behavior_matches": 0, "behavior_skips": 0, "audits": 0,
                "audit_count_mismatches": 0, "audit_trace_mismatches": 0,
                "disabled_fingerprints": 0, "collision_bypass_full_evaluations": 0,
+               "bf_protected_full_evaluations": 0, "bf_protected_evaluation_errors": 0,
+               "bf_protected_evaluation_seconds": 0.0,
                "collision_bypass_evaluation_seconds": 0.0, "collision_bypass_evaluation_errors": 0,
                "audit_evaluation_errors": 0, "probe_registration_errors": 0, "probe_errors": 0,
                "seed_full_evaluations": 0, "candidate_full_evaluations": 0,
@@ -101,6 +103,9 @@ def run_search(instances, probes, provider, config, out_dir):
 
     termination = "request_budget_completed"
     for request_index in range(1, calls + 1):
+        if stop_requested is not None and stop_requested():
+            termination = "sibling_run_stopped"
+            break
         island, parents = db.parents()
         messages = build_messages(mode, parents, enhanced_version=enhanced_version)
         event = {"request_index": request_index, "arm": arm, "island": island,
@@ -134,6 +139,7 @@ def run_search(instances, probes, provider, config, out_dir):
         prefix = tail = representative = None
         audit = False
         collision_bypass = False
+        bf_protected = False
         if response.get("error"):
             event["status"] = "provider_error"
             metrics["provider_errors"] += 1
@@ -176,6 +182,9 @@ def run_search(instances, probes, provider, config, out_dir):
                             try:
                                 representative, prefix, tail = screen.probe(program)
                                 collision_bypass = screen.is_disabled(prefix, tail)
+                                bf_protected = screen.protects_bf(prefix, tail)
+                                if bf_protected:
+                                    event.update(bf_protected=True, fingerprint_hash=digest([prefix, tail]))
                                 if collision_bypass:
                                     event.update(collision_bypass=True, fingerprint_hash=digest([prefix, tail]))
                             except (ValueError, ArithmeticError, TypeError, RuntimeError) as error:
@@ -199,11 +208,14 @@ def run_search(instances, probes, provider, config, out_dir):
                         else:
                             metrics["candidate_full_evaluations"] += 1
                             metrics["audits"] += int(audit)
+                            metrics["bf_protected_full_evaluations"] += int(bf_protected)
                             metrics["collision_bypass_full_evaluations"] += int(collision_bypass)
                             evaluation_before = metrics["evaluation_seconds"]
                             try:
                                 record = full_record(code, program, f"candidate_{request_index:06d}")
                             finally:
+                                if bf_protected:
+                                    metrics["bf_protected_evaluation_seconds"] += metrics["evaluation_seconds"] - evaluation_before
                                 if collision_bypass:
                                     metrics["collision_bypass_evaluation_seconds"] += metrics["evaluation_seconds"] - evaluation_before
                             metrics["valid_on_probes_or_search"] += 1
@@ -236,6 +248,7 @@ def run_search(instances, probes, provider, config, out_dir):
                 except (ValueError, ArithmeticError, TypeError, RuntimeError) as error:
                     metrics["invalid_candidates"] += 1
                     metrics["collision_bypass_evaluation_errors"] += int(collision_bypass)
+                    metrics["bf_protected_evaluation_errors"] += int(bf_protected)
                     if audit:
                         metrics["audit_evaluation_errors"] += 1
                     event.update(status="audit_evaluation_error" if audit else "candidate_error",

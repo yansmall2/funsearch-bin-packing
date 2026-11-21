@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from .packing import choose_index
 
-COLLISION_POLICIES = ("retain_representative", "disable_on_mismatch_v1")
+BF_PROTECTED = "protect_bf_disable_on_mismatch_v2"
+COLLISION_POLICIES = ("retain_representative", "disable_on_mismatch_v1", BF_PROTECTED)
 
 
 def fingerprint(program, states):
@@ -22,6 +23,10 @@ class BehavioralScreen:
         self.representatives = {}
         self.collision_policy = collision_policy
         self.disabled_fingerprints = set()
+        self.bf_fingerprint = None
+
+    def protects_bf(self, prefix, tail):
+        return self.bf_fingerprint is not None and (prefix, tail) == self.bf_fingerprint
 
     def is_disabled(self, prefix, tail):
         return tail is not None and (prefix, tail) in self.disabled_fingerprints
@@ -48,7 +53,7 @@ class BehavioralScreen:
         if not matches:
             return None, prefix, None
         tail = fingerprint(program, self.states[self.first_stage:])
-        if self.is_disabled(prefix, tail):
+        if self.is_disabled(prefix, tail) or self.protects_bf(prefix, tail):
             return None, prefix, tail
         for old_tail, record in matches:
             if old_tail == tail:
@@ -59,6 +64,11 @@ class BehavioralScreen:
         # Only call this with a successfully FULLY evaluated representative.
         prefix = fingerprint(program, self.states[:self.first_stage]) if prefix is None else prefix
         tail = fingerprint(program, self.states[self.first_stage:]) if tail is None else tail
+        if self.collision_policy == BF_PROTECTED and record["id"] == "seed_bf":
+            # Preserve the prefix entry so every later match reaches the 96-state tail.
+            self.bf_fingerprint = (prefix, tail)
+        elif self.protects_bf(prefix, tail):
+            return
         if self.is_disabled(prefix, tail):
             return
         self.representatives.setdefault(prefix, []).append((tail, record))
