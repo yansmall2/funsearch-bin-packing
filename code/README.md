@@ -16,6 +16,14 @@ Each step is a request to propose one candidate rule. Both budgets cover four gr
 
 Omit `--budget` to verify both studies. Add `--all-search` to recompute every measured candidate's sequence counts and action-trace digest. The default rechecks shortlisted search results, audited matches and all validation selections.
 
+| Entry point | Use |
+| --- | --- |
+| `results.py` | Verify published results offline. |
+| `scripts/run_study.py` | Check settings or start a new run of either DeepSeek preset. |
+| `formal.py` | Freeze experiments, seal candidates and run final evaluation. It delegates search to `experiment.py`. |
+| `experiment.py` | Lower-level search runner. Its default provider uses offline fixtures. |
+| `milestone.py` | Historical launcher for the initial 50-step plan (600 requests total). Published protocols pin its source hash. Its `check` command verifies the archived plan. |
+
 ## What the public evidence contains
 
 The [60-step records](evidence/search-60.json) and [200-step records](evidence/search-200.json) are ordinary JSON. They contain the scoring functions that completed full search evaluation, per-sequence integer counts, anonymous parent indices, original prompt SHA-256 digests, audit deltas, the returned model identifier, timing and cost statistics. Code and repeated count vectors each have a shared lookup table. Positive indices are the generation steps. The two negative parent indices identify the FF and BF seeds. Field names and status values are defined in each file.
@@ -60,12 +68,22 @@ The verifier checks the benchmark hashes and runs only the 60-step sealed source
 
 ## Optional new paid replicate
 
-Use a fresh checkout for each budget and CPython 3.13.5. The following 200-step example requires an authorized DeepSeek key in the local environment variable `FUNPACK_API_KEY`; an interactive terminal prompts if it is absent. Review the monetary and request limits before running. The higher request caps in the public configurations include historical ledger attempts. The schedule below requests 2,400 new candidates.
+From `code/` with CPython 3.13.5, check both presets offline first.
 
 ```sh
-python -B formal.py run --protocol evidence/protocol-200.json --api-config configs/deepseek-200.json --data data --out_dir run_new_200 --parallel-arms --allow-paid
-python -B formal.py seal --protocol evidence/protocol-200.json --study run_new_200 --data data --output run_new_200/candidates-sealed.json
-python -B audit_and_cost.py --study run_new_200 --data data --out-dir run_new_200/audit
+python -B scripts/run_study.py check
 ```
 
-For the 720-request study use the 60-step protocol and API configuration and a fresh output directory. On the original runs, 720 calls took 495.4 seconds and 2,400 calls took 1,868.2 seconds. Wall time depends on provider latency and contention. The measured phases include probe setup, screening, audits and validation. Per-run durations overlap under parallel execution.
+All files under `configs/deepseek*.json` read the DeepSeek key from `DEEPSEEK_API_KEY`. Both presets send requests to the official DeepSeek endpoint with `deepseek-flash` and thinking disabled. In an interactive terminal, the runner prompts for the DeepSeek key if the variable is unset.
+
+The signed records in `evidence/` retain the variable names used when the original runs were frozen. The launcher converts the variable name for the frozen runner and saves the effective, credential-free configuration alongside the new study. The underlying provider and API settings come from the selected preset.
+
+The 60-step preset schedules 720 new requests and the 200-step preset schedules 2,400. Both use a CNY 100 ceiling. The stored caps of 724 and 3,132 include earlier attempts from the original ledger. A new run uses a separate ledger inside its output directory.
+
+```sh
+python -B scripts/run_study.py run --budget 200 --out-dir run_new_200 --allow-paid
+python -B formal.py seal --protocol evidence/protocol-200.json --study run_new_200/study --data data --output run_new_200/study/candidates-sealed.json
+python -B audit_and_cost.py --study run_new_200/study --data data --out-dir run_new_200/audit
+```
+
+Use `--budget 60`, `run_new_60` and `evidence/protocol-60.json` for the shorter study. On the original runs, 720 requests took 495.4 seconds and 2,400 requests took 1,868.2 seconds. The measured phases include probe setup, screening, audits and validation. Per-run durations overlap under parallel execution.

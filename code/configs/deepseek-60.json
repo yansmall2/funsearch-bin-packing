@@ -3,7 +3,7 @@
   "base_url": "https://api.deepseek.com",
   "model": "deepseek-flash",
   "expected_model_version": "DeepSeek-V4.1-Flash-1017",
-  "api_key_env": "FUNPACK_API_KEY",
+  "api_key_env": "DEEPSEEK_API_KEY",
   "temperature": 0.8,
   "max_tokens": 1024,
   "timeout_seconds": 120,

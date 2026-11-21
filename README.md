@@ -32,4 +32,6 @@ python -B results.py --budget 200
 python -B results.py --final60
 ```
 
+These commands verify the saved results offline. Use [the live-run instructions](code/README.md#optional-new-paid-replicate) to check API settings or start a new run.
+
 The experimental history remains accessible at the [previous main revision](https://github.com/yansmall2/funsearch-bin-packing/tree/9a3438be998321112ed981f4a4e125007bde0f98) and the [archived Muse experiment](https://github.com/yansmall2/funsearch-bin-packing/tree/2aba932339600c42ca76c9251deb2c3e6ffe2db6). Earlier model configurations and benchmarks are identified separately in the report.
