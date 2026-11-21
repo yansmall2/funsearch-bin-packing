@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "kind": "formal_protocol",
+  "frozen_at_utc": "2026-11-21T04:36:52.213002+00:00",
+  "plan": {
+    "schema_version": 2,
+    "status": "draft",
+    "arms": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "seeds": [
+      101,
+      202,
+      303
+    ],
+    "calls_per_run": 50,
+    "islands": 4,
+    "reset_every": 50,
+    "audit_rate": 0.1,
+    "database_temperature": 1,
+    "enhanced_prompt_version": "mechanism_v3",
+    "collision_policy": "protect_bf_disable_on_mismatch_v2",
+    "evaluation_timeout_seconds": 30,
+    "validation_timeout_seconds": 30,
+    "final_timeout_seconds": 30
+  },
+  "api_config": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "expected_model_version": "DeepSeek-V4.1-Flash-1017",
+    "api_key_env": "FUNPACK_API_KEY",
+    "ledger_path": "local_state/deepseek.sqlite3",
+    "temperature": 0.8,
+    "max_tokens": 1024,
+    "timeout_seconds": 120,
+    "max_requests": 600,
+    "extra_body": {
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "budget": {
+      "currency": "CNY",
+      "max_cost": 100,
+      "input_per_million": 2,
+      "output_per_million": 8,
+      "pricing_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "pricing_checked_date": "2026-11-21",
+      "price_assumption": "Peak uncached input and output; no discounts assumed."
+    }
+  },
+  "total_planned_requests": 600,
+  "source_hashes": {
+    "experiment.py": "c8cdd4da62eb70ac54976bd49fb9c3482d5fc3a00d6f43309c04eed882afd647",
+    "formal.py": "88110e916a8514e91a6b674944b6baecac353cf9108768ac4e709467c96efce3",
+    "milestone.py": "cf0093b8eae1be746b5c138ce3b8c81ba4c4e6adbd64cb0fe41001d0f3bf84ed",
+    "funpack/__init__.py": "720e69c3b56cb12c0f62b7908cc92843ff350e11a46db12361f8320fcff33c48",
+    "funpack/data.py": "0e4199f74105c88cf4fcfe69b1cd5a85bb1b097ff7c2bce8083be1c691fca4dc",
+    "funpack/database.py": "28ea4b08bf322ded891411539702171314e0dd08938b0b392b6ba0ca1b45df0e",
+    "funpack/ledger.py": "8716a57ef4a96d371e41ac2dbe238ca0d950f61daf1f5cf329dda125c7fb8c31",
+    "funpack/packing.py": "70ad438ee4b954df903decbe601b8ebf07b0d5e6dfd284418608e7c385ab9ee3",
+    "funpack/programs.py": "4635155aa2dd714797227a270edbbaeed22f474047e93ce7768a1ce17d9e4bb8",
+    "funpack/prompts.py": "3fe8b25ea45179cd3497666cda87396b5494aa5867d6cec9248947009dca486f",
+    "funpack/providers.py": "8f00faea7f74d6edcf10cd21249e2fd410edcac331feca1045c6d48e85a9336a",
+    "funpack/protocol.py": "a325fa4a3c4f23a686c46a1aead475155507f89e1b3977e1bbe37246571076cf",
+    "funpack/screening.py": "79cdf8a425a9a9db8fb31697bbbb1bebfa30609e63e083a1989b98b628ab741e",
+    "funpack/search.py": "3bfd219791286296aa862788750b46ef28503c4b8ee9a0581c8939a5c5f9cb1a",
+    "funpack/storage.py": "5f412b8386cfcff903b10339f3c0649868db0450ac9c673674e639db829e8000"
+  },
+  "data_files": {
+    "development.json": "563275ba5302a8f0b1b0d10d99d44efc1f5e49f051266a97e0fac1914bb57746",
+    "search.json": "d340309bc97b98725cc43aaa8e5d8f12bb174b75cb7aeb724953f62e041e8dfd",
+    "validation.json": "a45aa2f9b92580f661bd1c67d945cd6904c8d8afed3425af7f382c61c1d15bb3",
+    "probes.json": "e0da70485646ef53a27f75501da5b0d8c3d1b747e2e5a223920c4750707bf1cf",
+    "manifest.json": "4d434661cd89a488e0ac393e847bb1faab3d780193ce1cabce0fd81ed698be15"
+  },
+  "data_hashes": {
+    "search": "ef0f42e06ce9cb9354f3dea83382643cc143fdcd640595171ea01abf9c476a97",
+    "validation": "394b41525697c8601d3b24ceb07fb6d495f0942865ee1097ce869fc56e15bc9e",
+    "probes": "e8b5c75384b4c67d208b4d0af353e499f58954e4326ca2dce1ca4ec1d15a2511"
+  },
+  "data_counts": {
+    "search": 30,
+    "validation": 10,
+    "probes": 128
+  },
+  "heldout_files": {
+    "heldout/test.json": "9e5ed4d70c39b3cefe8b209c5915ce30d75c0bb82081e244aa9888075309cbff",
+    "heldout/or3.json": "1b6c81badcfd5ec8f99c74a12078a712b4e98b747cd6063b60d538e68c5619f7"
+  },
+  "python_version": "3.13.5",
+  "heldout_evaluated": false,
+  "notes": "File hashes are integrity checks, not proof against deliberate editing. API model aliases do not verify an immutable backend version.",
+  "protocol_id": "fe2237f21cd699b022f761d42312ac21f25108cd7ddb95c9525d0072a90226ec"
+}
