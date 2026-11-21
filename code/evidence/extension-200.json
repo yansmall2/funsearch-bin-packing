@@ -1,0 +1,11 @@
+{
+  "prior_protocol": "80f1ed2aeadd79ad1357145d90fe0ad5645f134635cb9cf2623cbb82066edc75",
+  "replacement_protocol": "04dd3e2d63062aef4fa307688fb3e63cc3c5b2cdb8afa334648a2a1edde2292c",
+  "prior_study": "run_60",
+  "excluded_attempts": 0,
+  "retained_prior_attempts": 732,
+  "cost_reservation_retained_cny": 2.015862,
+  "formal_generation_slots": 2400,
+  "cumulative_http_generation_attempt_cap": 3132,
+  "cumulative_cost_ceiling_cny": 100
+}
