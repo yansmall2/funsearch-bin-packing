@@ -138,6 +138,9 @@ def analyze(study_dir, data_dir, setup_measurement=None):
                 "unknown_cost_requests": metrics["unknown_cost_requests"]}
         runs.append({"run": run["run"], "arm": run["arm"], "seed": run["seed"],
                      "collision_handling": {
+                         "bf_protected_full_evaluations": metrics.get("bf_protected_full_evaluations", 0),
+                         "bf_protected_evaluation_errors": metrics.get("bf_protected_evaluation_errors", 0),
+                         "bf_protected_seconds_subset": metrics.get("bf_protected_evaluation_seconds", 0.0),
                          "disabled_fingerprints": metrics.get("disabled_fingerprints", 0),
                          "bypass_full_evaluations": metrics.get("collision_bypass_full_evaluations", 0),
                          "bypass_evaluation_errors": metrics.get("collision_bypass_evaluation_errors", 0),

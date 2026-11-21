@@ -1,0 +1,197 @@
+{
+  "pilot_witnesses": [
+    {
+      "arm": "C",
+      "index": 5,
+      "code": "def priority(item, bins):\n    return [-(r - item) - 0.5 * (r % item) for r in bins]\n"
+    },
+    {
+      "arm": "D",
+      "index": 3,
+      "code": "def priority(item, bins):\n    return [-(r - item) + (item / 2.0 if item <= (r - item) and (r - item) < 2 * item else 0.0) for r in bins]\n"
+    }
+  ],
+  "archive_commit": "2aba932339600c42ca76c9251deb2c3e6ffe2db6",
+  "historical_selections": [
+    {
+      "run": "A_seed11",
+      "arm": "A",
+      "seed": 11,
+      "search": 265.1333333333333,
+      "validation": 267.6,
+      "metrics": {
+        "full": 100,
+        "skips": 0
+      },
+      "audit": {
+        "complete": 0,
+        "quality": 0
+      }
+    },
+    {
+      "run": "B_seed11",
+      "arm": "B",
+      "seed": 11,
+      "search": 265.03333333333336,
+      "validation": 267.7,
+      "metrics": {
+        "full": 90,
+        "skips": 0
+      },
+      "audit": {
+        "complete": 0,
+        "quality": 0
+      }
+    },
+    {
+      "run": "C_seed11",
+      "arm": "C",
+      "seed": 11,
+      "search": 265.06666666666666,
+      "validation": 267.7,
+      "metrics": {
+        "full": 76,
+        "skips": 21
+      },
+      "audit": {
+        "complete": 6,
+        "quality": 3
+      }
+    },
+    {
+      "run": "D_seed11",
+      "arm": "D",
+      "seed": 11,
+      "search": 265.06666666666666,
+      "validation": 267.7,
+      "metrics": {
+        "full": 73,
+        "skips": 26
+      },
+      "audit": {
+        "complete": 9,
+        "quality": 5
+      }
+    },
+    {
+      "run": "A_seed22",
+      "arm": "A",
+      "seed": 22,
+      "search": 265.1666666666667,
+      "validation": 267.6,
+      "metrics": {
+        "full": 100,
+        "skips": 0
+      },
+      "audit": {
+        "complete": 0,
+        "quality": 0
+      }
+    },
+    {
+      "run": "B_seed22",
+      "arm": "B",
+      "seed": 22,
+      "search": 265.03333333333336,
+      "validation": 267.7,
+      "metrics": {
+        "full": 92,
+        "skips": 0
+      },
+      "audit": {
+        "complete": 0,
+        "quality": 0
+      }
+    },
+    {
+      "run": "C_seed22",
+      "arm": "C",
+      "seed": 22,
+      "search": 265.06666666666666,
+      "validation": 267.7,
+      "metrics": {
+        "full": 73,
+        "skips": 27
+      },
+      "audit": {
+        "complete": 2,
+        "quality": 1
+      }
+    },
+    {
+      "run": "D_seed22",
+      "arm": "D",
+      "seed": 22,
+      "search": 265.1333333333333,
+      "validation": 267.6,
+      "metrics": {
+        "full": 59,
+        "skips": 41
+      },
+      "audit": {
+        "complete": 5,
+        "quality": 3
+      }
+    },
+    {
+      "run": "A_seed33",
+      "arm": "A",
+      "seed": 33,
+      "search": 265.03333333333336,
+      "validation": 267.6,
+      "metrics": {
+        "full": 100,
+        "skips": 0
+      },
+      "audit": {
+        "complete": 0,
+        "quality": 0
+      }
+    },
+    {
+      "run": "B_seed33",
+      "arm": "B",
+      "seed": 33,
+      "search": 265.03333333333336,
+      "validation": 267.7,
+      "metrics": {
+        "full": 90,
+        "skips": 0
+      },
+      "audit": {
+        "complete": 0,
+        "quality": 0
+      }
+    },
+    {
+      "run": "C_seed33",
+      "arm": "C",
+      "seed": 33,
+      "search": 265.06666666666666,
+      "validation": 267.7,
+      "metrics": {
+        "full": 69,
+        "skips": 30
+      },
+      "audit": {
+        "complete": 2,
+        "quality": 1
+      }
+    },
+    {
+      "run": "D_seed33",
+      "arm": "D",
+      "seed": 33,
+      "search": 265.06666666666666,
+      "validation": 267.5,
+      "metrics": {
+        "full": 52,
+        "skips": 48
+      },
+      "audit": {
+        "complete": 3,
+        "quality": 1
+      }
+    }
+  ]
+}
