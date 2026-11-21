@@ -2,24 +2,24 @@
 
 CS5491 Artificial Intelligence · Group G004 · Project milestone, November 2026
 
-We compare two ways to guide a language model's search for online bin-packing programs. A mechanism prompt asks when a rule will choose a different bin. A two-stage screen compares bin choices before deciding which candidate programs to evaluate fully.
+Can a language model find a better rule for selecting a bin, and how many candidate rules do we need to evaluate? We compare a basic prompt with one that asks when a bin choice would change. We also test whether a short set of probes can identify candidates worth skipping.
 
 | Start here | Contents |
 | --- | --- |
-| [Milestone report (PDF, 4 pages)](report/milestone.pdf) | Research questions, method, per-seed results, audits, timing and limitations |
+| [Milestone report draft (PDF, 3 pages)](report/milestone.pdf) | Method, per-seed results and the screening audits |
 | [Reproduction guide](code/README.md) | Environment, commands, expected output and data provenance |
 | [Experiment evidence](code/evidence) | Frozen protocols, measured candidate programs, prompt checksums and archived outcomes |
 
 ## What the experiments found
 
-Each study had four conditions and three search seeds. All 3,120 formal responses came from DeepSeek Flash with thinking disabled.
+Each study had four groups and three random seeds per group. One step is one DeepSeek Flash request for a candidate rule.
 
 | Budget per condition and seed | Completed requests | Validation finding | Elapsed wall time |
 | --- | ---: | --- | ---: |
 | 60 steps | 720 | All 12 selected programs tied Best Fit at 267.7 mean bins. | 8.3 min |
 | 200 steps | 2,400 | Two D runs reached 267.6. Each saved one bin on the same validation sequence. | 31.1 min |
 
-Comparing each 200-step trajectory with its own first 60 steps, 9 of 12 best search scores improved. Validation improved once and tied eleven times. The 200-step winners were sealed at validation. The report gives the previously completed final tests of the 60-step winners.
+Within the longer runs, we compared the candidates available at step 60 with those available at step 200. Best search scores improved in 9 of 12 runs and validation improved in 1 of 12. The 60-step study also has results on the synthetic test set and OR3.
 
 ## Reproduce the main comparison
 
