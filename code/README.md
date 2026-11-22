@@ -98,6 +98,6 @@ python -B audit_and_cost.py --study run_new_200/study --data data --out-dir run_
 
 Use `--budget 60`, `run_new_60` and `evidence/protocol-60.json` for the shorter study. On the original runs, 720 requests took 495.4 seconds and 2,400 requests took 1,868.2 seconds. The measured phases include probe setup, screening, audits and validation. Per-run durations overlap under parallel execution.
 
-## Exploratory Muse replay
+## Exploratory search with Muse agents
 
-We replayed 1,200 saved proposals from an earlier Muse experiment to compare two screening policies on the same candidate stream. The generator reported `muse-spark-1.3`. The archive revision and per-run outcomes are in the [paired replay results](evidence/replay.json).
+In a separate exploratory experiment, AI agents using `muse-spark-1.3` generated packing rules in an automated FunSearch loop. The runner screened and scored candidates, then used evaluated rules to build later prompts. We later replayed the 1,200 saved proposals under two screening policies. [Paired replay results](evidence/replay.json)
