@@ -56,16 +56,6 @@ To repeat the comparison with the local original logs, point the script at the d
 python -B replay_probe_counts.py --study-dir /path/to/run_200 --workers 4 --out probe-count-replay-local.json
 ```
 
-## Optional historical replay
-
-The [paired replay results](evidence/replay.json) describe fixed proposals from the publicly archived Muse experiment. Its generator-reported model was muse-spark-1.3 and token use was unavailable. To rerun all 1,200 historical proposals, obtain the pinned historical checkout first, then run the local evaluator. On the reference machine the four-worker comparison took about seven minutes.
-
-```sh
-git clone --single-branch --branch fatbaby/smoke-test-20261114 https://github.com/yansmall2/funsearch-bin-packing.git ../muse-archive
-git -C ../muse-archive checkout 2aba932339600c42ca76c9251deb2c3e6ffe2db6
-python -B replay_archive.py --archive-checkout ../muse-archive --workers 4 --out replay-local.json
-```
-
 ## Data and optional final-benchmark replication
 
 `data/` includes the development, search, validation and probe files and the manifest. All four are generated deterministically. The public submission provides a checksum-pinned download script for the upstream FunSearch notebook containing OR3. The script parses the notebook as data. It does not execute notebook code. Source and attribution details are in [Third-party notices](THIRD_PARTY_NOTICES.md).
@@ -107,3 +97,7 @@ python -B audit_and_cost.py --study run_new_200/study --data data --out-dir run_
 ```
 
 Use `--budget 60`, `run_new_60` and `evidence/protocol-60.json` for the shorter study. On the original runs, 720 requests took 495.4 seconds and 2,400 requests took 1,868.2 seconds. The measured phases include probe setup, screening, audits and validation. Per-run durations overlap under parallel execution.
+
+## Exploratory Muse replay
+
+We replayed 1,200 saved proposals from an earlier Muse experiment to compare two screening policies on the same candidate stream. The generator reported `muse-spark-1.3`. The archive revision and per-run outcomes are in the [paired replay results](evidence/replay.json).
